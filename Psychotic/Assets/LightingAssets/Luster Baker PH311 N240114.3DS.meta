@@ -1,0 +1,183 @@
+fileFormatVersion: 2
+guid: 80d25d3a4c9175447a21d359e9bd76ff
+timeCreated: 1443837041
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Circle13
+    100002: Circle14
+    100004: Circle15
+    100006: Cylinder25
+    100008: Cylinder26
+    100010: Cylinder27
+    100012: Line79
+    100014: Line80
+    100016: Line81
+    100018: Line82
+    100020: Line83
+    100022: //RootNode
+    100024: Object
+    100026: Rectangle1
+    100028: Rectangle2
+    100030: Rectangle3
+    100032: Rectangle4
+    100034: Rectangle5
+    100036: Rectangle6
+    100038: Sphere01
+    100040: Sphere2812
+    100042: Sphere2813
+    100044: Sphere2814
+    400000: Circle13
+    400002: Circle14
+    400004: Circle15
+    400006: Cylinder25
+    400008: Cylinder26
+    400010: Cylinder27
+    400012: Line79
+    400014: Line80
+    400016: Line81
+    400018: Line82
+    400020: Line83
+    400022: //RootNode
+    400024: Object
+    400026: Rectangle1
+    400028: Rectangle2
+    400030: Rectangle3
+    400032: Rectangle4
+    400034: Rectangle5
+    400036: Rectangle6
+    400038: Sphere01
+    400040: Sphere2812
+    400042: Sphere2813
+    400044: Sphere2814
+    2300000: Circle13
+    2300002: Circle14
+    2300004: Circle15
+    2300006: Cylinder25
+    2300008: Cylinder26
+    2300010: Cylinder27
+    2300012: Line79
+    2300014: Line80
+    2300016: Line81
+    2300018: Line82
+    2300020: Line83
+    2300022: Object
+    2300024: Rectangle1
+    2300026: Rectangle2
+    2300028: Rectangle3
+    2300030: Rectangle4
+    2300032: Rectangle5
+    2300034: Rectangle6
+    2300036: Sphere01
+    2300038: Sphere2812
+    2300040: Sphere2813
+    2300042: Sphere2814
+    3300000: Circle13
+    3300002: Circle14
+    3300004: Circle15
+    3300006: Cylinder25
+    3300008: Cylinder26
+    3300010: Cylinder27
+    3300012: Line79
+    3300014: Line80
+    3300016: Line81
+    3300018: Line82
+    3300020: Line83
+    3300022: Object
+    3300024: Rectangle1
+    3300026: Rectangle2
+    3300028: Rectangle3
+    3300030: Rectangle4
+    3300032: Rectangle5
+    3300034: Rectangle6
+    3300036: Sphere01
+    3300038: Sphere2812
+    3300040: Sphere2813
+    3300042: Sphere2814
+    4300000: Sphere2812
+    4300002: Rectangle5
+    4300004: Circle13
+    4300006: Sphere2813
+    4300008: Sphere2814
+    4300010: Cylinder25
+    4300012: Rectangle1
+    4300014: Rectangle2
+    4300016: Rectangle3
+    4300018: Line79
+    4300020: Rectangle4
+    4300022: Rectangle6
+    4300024: Circle14
+    4300026: Cylinder26
+    4300028: Cylinder27
+    4300030: Line80
+    4300032: Circle15
+    4300034: Line81
+    4300036: Line82
+    4300038: Line83
+    4300040: Sphere01
+    4300042: Object
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
