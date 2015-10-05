@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//Increases battery life
 public class BatteryPlus : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+	GameObject obj = GameObject.Find("Flashlight");
+
+	void OnTriggerEnter(Collider Battery) {
+		FlashlightScript sc = (FlashlightScript)obj.GetComponent (typeof(FlashlightScript))
+		FlashlightScript.FlashlightBattery = 100f;
+		DestroyObject (gameObject);
 	}
 }
