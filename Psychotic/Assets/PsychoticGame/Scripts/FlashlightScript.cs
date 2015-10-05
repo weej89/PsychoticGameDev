@@ -1,4 +1,4 @@
-﻿#region Using
+#region Using
 using UnityEngine;
 using System.Collections;
 #endregion
@@ -8,10 +8,16 @@ public class FlashlightScript : MonoBehaviour
 
 	#region Public Fields
 	public bool FlashlightOn;
+
+	public float FlashlightBattery
+	{
+		get{return flashlightBattery;}
+	}
+
 	#endregion
 
 	#region Private Fields
-	private float FlashlightBattery;
+	private float flashlightBattery;
 	private Light flashLight;
 	#endregion
 
@@ -22,7 +28,7 @@ public class FlashlightScript : MonoBehaviour
 	void Start ()
 	{
 		FlashlightOn = false;
-		FlashlightBattery = 100f;
+		flashlightBattery = 100f;
 		flashLight = this.GetComponent<Light>();
 	}
 	#endregion
@@ -36,15 +42,22 @@ public class FlashlightScript : MonoBehaviour
 	/// </summary>
 	void Update ()
 	{
-		if (FlashlightOn && FlashlightBattery > 0) 
+		if (FlashlightOn && flashlightBattery > 0) 
 		{
 			flashLight.intensity = 1;
-			FlashlightBattery -= .1f;
+			flashlightBattery -= .1f;
 		} 
 		else 
 		{
 			flashLight.intensity = 0;
 		}
+	}
+	#endregion
+
+	#region AddBatteryLife
+	public void AddBatteryLife(float battery)
+	{
+		flashlightBattery += battery;
 	}
 	#endregion
 }
