@@ -21,6 +21,11 @@ public class Grid : MonoBehaviour {
 		CreateGrid();
 	}
 
+	public int MaxSize
+	{
+		get{return gridSizeX * gridSizeY;}
+	}
+
 	void CreateGrid()
 	{
 		grid=new Node[gridSizeX,gridSizeY];
@@ -76,6 +81,7 @@ public class Grid : MonoBehaviour {
 	}
 
 	public List<Node> path;
+	/*
 	void OnDrawGizmos()
 	{
 		Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
@@ -103,5 +109,6 @@ public class Grid : MonoBehaviour {
 			}
 		}
 	}
+*/
 
 }

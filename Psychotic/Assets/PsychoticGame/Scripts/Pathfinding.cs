@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public class Pathfinding : MonoBehaviour {
 	Grid grid;
 	public Transform seeker;
 	public Transform target;
-	public bool pathFound=false;
 
 	void Awake()
 	{
@@ -15,34 +15,32 @@ public class Pathfinding : MonoBehaviour {
 
 	void Update()
 	{
-		FindPath(seeker.position, target.position);
+		if(Input.GetKeyDown("space") || Input.GetKeyDown("a") || Input.GetKeyDown("s")|| Input.GetKeyDown("d")|| Input.GetKeyDown("w"))
+			FindPath(seeker.position, target.position);
 	}
 
 	void FindPath(Vector3 startPos, Vector3 targetPos)
 	{
+		Stopwatch sw = new Stopwatch();
+		sw.Start();
+
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint (targetPos);
 
-		List<Node> openSet = new List<Node>();
+		Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 		HashSet<Node> closedSet = new HashSet<Node>();
 		openSet.Add(startNode);
 
 		while (openSet.Count>0)
 		{
-			Node currentNode=openSet[0];
-			for(int i=1; i<openSet.Count; i++)
-			{
-				if(openSet[i].fCost < currentNode.fCost || openSet[i].fCost == currentNode.fCost && openSet[i].hCost < currentNode.hCost)
-					currentNode=openSet[i];
-			}
-
-			openSet.Remove(currentNode);
+			Node currentNode=openSet.RemoveFirst();
 			closedSet.Add(currentNode);
 
 			if(currentNode==targetNode)
 			{
+				sw.Stop();
+				print("Path found: " +sw.ElapsedMilliseconds+ " ms");
 				RetracePath(startNode, targetNode);
-				pathFound=true;
 				return;
 			}
 
