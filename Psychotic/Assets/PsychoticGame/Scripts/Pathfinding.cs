@@ -15,12 +15,6 @@ public class Pathfinding : MonoBehaviour
 		grid=GetComponent<Grid>();
 	}
 
-	//void Update()
-	//{
-		//if(Input.GetKeyDown("space") || Input.GetKeyDown("a") || Input.GetKeyDown("s")|| Input.GetKeyDown("d")|| Input.GetKeyDown("w"))
-			//FindPath(seeker.position, target.position);
-	//}
-
 	public void StartFindPath(Vector3 startPos, Vector3 targetPos)
 	{
 		StartCoroutine(FindPath(startPos, targetPos));
@@ -34,9 +28,9 @@ public class Pathfinding : MonoBehaviour
 		Vector3 [] waypoints = new Vector3[0];
 		bool pathSuccess = false;
 
-
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint (targetPos);
+
 		if(startNode.walkable && targetNode.walkable)
 		{
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
@@ -52,8 +46,7 @@ public class Pathfinding : MonoBehaviour
 				{
 					sw.Stop();
 					pathSuccess = true;
-					print("Path found: " +sw.ElapsedMilliseconds+ " ms");
-					RetracePath(startNode, targetNode);
+					//print("Path found: " +sw.ElapsedMilliseconds+ " ms");
 					break;
 				}
 
@@ -100,7 +93,6 @@ public class Pathfinding : MonoBehaviour
 		}
 		Vector3[] waypoints = SimplifyPath(path);
 		Array.Reverse(waypoints);
-		grid.path = path;
 
 		return waypoints;
 	}

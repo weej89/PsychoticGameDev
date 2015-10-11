@@ -3,18 +3,45 @@ using System.Collections;
 
 public class HorrorAI : MonoBehaviour {
 
+	#region Public Variables
 	public Transform target;
-	float speed = 2;
+	public float speed = 2;
+	public double newPathAvgTime;
+	public float rotationSpeed;
+	#endregion
+
+	#region Private Variables
 	Vector3[] path;
-
 	int targetIndex;
+	double currentTime = 0;
+	double interval;
+	bool targetReached = false;
 
-	void Awake()
+	private Quaternion lookRotation;
+	private Vector3 direction;
+	#endregion
+
+	void Start()
 	{
-		print("Zombie Transform : " +transform.position.x+","+transform.position.y +","+transform.position.z);
-		print("Target Transform : " +target.position.x+","+target.position.y +","+target.position.z);
-	
 		PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+	}
+
+	void Update()
+	{
+		if(targetReached == true)
+			CallForNewPath();
+	}
+
+	void CallForNewPath()
+	{
+		if(currentTime < interval)
+			currentTime += Time.deltaTime;
+		else
+		{
+			targetReached = false;
+			currentTime = 0;
+			PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+		}
 	}
 
 	public void OnPathFound(Vector3[] newPath, bool pathSuccessful)
@@ -22,7 +49,6 @@ public class HorrorAI : MonoBehaviour {
 		if(pathSuccessful)
 		{
 			path = newPath;
-			print ("New path " +path[0].x);
 			StopCoroutine("FollowPath");
 			StartCoroutine("FollowPath");
 		}
@@ -31,19 +57,64 @@ public class HorrorAI : MonoBehaviour {
 	IEnumerator FollowPath()
 	{
 		Vector3 currentWaypoint = path[0];
-		print ("Path at 0 = " +path[0].x);
 
 		while(true)
 		{
-			if(transform.position == currentWaypoint)
+			if(WithinOne(currentWaypoint))
 			{
 				targetIndex++;
 				if(targetIndex >= path.Length)
+				{
+					targetReached = true;
+					interval = GetNextRandomInterval(newPathAvgTime);
+					targetIndex=0;
 					yield break;
+				}
 				currentWaypoint = path[targetIndex];
 			}
-			transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed);
+
+			direction = (currentWaypoint - transform.position).normalized;
+			lookRotation = Quaternion.LookRotation(direction);
+			transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+			transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
 			yield return null;
 		}
+	}
+
+	public void OnDrawGizmos()
+	{
+		if(path!=null)
+		{
+			for(int i = targetIndex; i<path.Length; i++)
+			{
+				Gizmos.color = Color.black;
+				Gizmos.DrawCube(path[i], Vector3.one);
+
+				if(i == targetIndex)
+				{
+					Gizmos.DrawLine(transform.position, path[i]);
+				}
+				else
+				{
+					Gizmos.DrawLine(path[i-1], path[i]);
+				}
+			}
+		}
+	}
+
+	bool WithinOne(Vector3 target)
+	{
+		if(Mathf.Abs(target.x - transform.position.x) < 1 && Mathf.Abs(target.z - transform.position.z) < 1)
+			return true;
+		else
+			return false;
+	}
+
+	public double GetNextRandomInterval(double avg)
+	{
+		avg = (1/avg);
+		double interval = -Mathf.Log((float)(1.0 - Random.value)) / avg;
+		print ("Interval: "+interval);
+		return interval;
 	}
 }
