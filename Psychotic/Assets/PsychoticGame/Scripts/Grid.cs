@@ -12,12 +12,15 @@ public class Grid : MonoBehaviour {
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
 	public bool drawingGizmos = false;
+	public TerrainType [] walkableRegions;
 	#endregion
 
 	#region Private Variables
 	float nodeDiameter;
 	int gridSizeX, gridSizeY;
 	Node[,] grid;
+	LayerMask walkableMask;
+	Dictionary <int, int> walkableRegionsDictionary = new Dictionary<int, int>();
 	#endregion
 
 	#region Awake
@@ -32,6 +35,12 @@ public class Grid : MonoBehaviour {
 		nodeDiameter=nodeRadius*2;
 		gridSizeX=Mathf.RoundToInt(gridWorldSize.x/nodeDiameter);
 		gridSizeY=Mathf.RoundToInt(gridWorldSize.y/nodeDiameter);
+
+		foreach(TerrainType region in walkableRegions)
+		{
+			walkableMask.value = walkableMask | region.terrainMask.value;
+			walkableRegionsDictionary.Add((int)Mathf.Log(region.terrainMask.value, 2),region.terrainPenalty);
+		}
 		CreateGrid();
 	}
 	#endregion
@@ -62,7 +71,19 @@ public class Grid : MonoBehaviour {
 			{
 				Vector3 worldPoint=worldBottmLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
 				bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
-				grid[x,y]=new Node(walkable, worldPoint, x, y);
+
+				int movementPenalty = 0;
+
+				if(walkable)
+				{
+					Ray ray = new Ray(worldPoint + Vector3.up * 50, Vector3.down);
+					RaycastHit hit;
+					if(Physics.Raycast(ray, out hit, 100, walkableMask))
+					{
+						walkableRegionsDictionary.TryGetValue(hit.collider.gameObject.layer, out movementPenalty);
+					}
+				}
+				grid[x,y]=new Node(walkable, worldPoint, x, y, movementPenalty);
 			}
 		}
 	}
@@ -77,6 +98,7 @@ public class Grid : MonoBehaviour {
 	public List<Node> GetNeighbors(Node node)
 	{
 		List<Node> neighbors = new List<Node>();
+		int movmentPenalty = 0;
 
 		for(int x=-1; x<=1; x++)
 		{
@@ -91,13 +113,39 @@ public class Grid : MonoBehaviour {
 				if(checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
 				{
 					neighbors.Add(grid[checkX, checkY]);
+					DetermineMovementPenalty(grid[checkX, checkY]);
 				}
 			}
 		}
-
+		
 		return neighbors;
 	}
 	#endregion
+
+	public void DetermineMovementPenalty(Node node)
+	{
+		int movmentPenalty = 0;
+		
+		for(int x=-1; x<=1; x++)
+		{
+			for(int y=-1; y<=1; y++)
+			{
+				if(x==0 && y==0)
+					continue;
+				
+				int checkX = node.gridX + x;
+				int checkY = node.gridY + y;
+				
+				if(checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
+				{
+					if(grid[checkX, checkY].walkable == false)
+						movmentPenalty += 5;
+				}
+			}
+		}
+		
+		node.movementPenalty += movmentPenalty;
+	}
 
 	#region NodeFromWorldPoint
 	/// <summary>
@@ -144,4 +192,11 @@ public class Grid : MonoBehaviour {
 		}
 	}
 	#endregion
+
+	[System.Serializable]
+	public class TerrainType
+	{
+		public LayerMask terrainMask;
+		public int terrainPenalty;
+	}
 }

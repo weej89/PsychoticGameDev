@@ -12,6 +12,7 @@ public class Node : IHeapItem<Node> {
 	public int gCost;
 	public int hCost;
 	public Node parent;
+	public int movementPenalty;
 	#endregion
 
 	#region Private Variables
@@ -26,12 +27,13 @@ public class Node : IHeapItem<Node> {
 	/// <param name="_worldPos">_world position.</param>
 	/// <param name="_gridX">_grid x.</param>
 	/// <param name="_gridY">_grid y.</param>
-	public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY)
+	public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY, int _penalty)
 	{
 		walkable=_walkable;
 		worldPosition=_worldPos;
 		gridX=_gridX;
 		gridY=_gridY;
+		movementPenalty=_penalty;
 	}
 	#endregion
 

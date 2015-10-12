@@ -82,7 +82,7 @@ public class Pathfinding : MonoBehaviour
 						continue;
 					}
 
-					int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
+					int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor) + neighbor.movementPenalty;
 					if(newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
 					{
 						neighbor.gCost = newMovementCostToNeighbor;
@@ -119,14 +119,17 @@ public class Pathfinding : MonoBehaviour
 	Vector3[] RetracePath(Node startNode, Node endNode)
 	{
 		List<Node> path = new List<Node>();
+		List<Vector3> points = new List<Vector3>();
 		Node currentNode = endNode;
 
 		while(currentNode != startNode)
 		{
 			path.Add(currentNode);
+			points.Add(currentNode.worldPosition);
 			currentNode = currentNode.parent;
 		}
-		Vector3[] waypoints = SimplifyPath(path);
+		//Vector3[] waypoints = SimplifyPath(path);
+		Vector3[] waypoints = points.ToArray();
 		Array.Reverse(waypoints);
 
 		return waypoints;
