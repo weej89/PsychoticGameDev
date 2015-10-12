@@ -1,19 +1,32 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#endregion
 
 public class Grid : MonoBehaviour {
 
+	#region Public Variables
 	public Transform player;
 	public LayerMask unwalkableMask;
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
-	Node[,] grid;
 	public bool drawingGizmos = false;
+	#endregion
 
+	#region Private Variables
 	float nodeDiameter;
 	int gridSizeX, gridSizeY;
+	Node[,] grid;
+	#endregion
 
+	#region Awake
+	/// <summary>
+	/// Awake this instance.
+	/// Sets a node diameter to make up positions in the grid
+	/// Gets both y and x values = to world size / nodeDiameter
+	/// Creates the grid
+	/// </summary>
 	void Awake()
 	{
 		nodeDiameter=nodeRadius*2;
@@ -21,12 +34,23 @@ public class Grid : MonoBehaviour {
 		gridSizeY=Mathf.RoundToInt(gridWorldSize.y/nodeDiameter);
 		CreateGrid();
 	}
+	#endregion
 
+	#region MaxSize
+	/// <summary>
+	/// Gets the max size of the Grid
+	/// </summary>
+	/// <value>The max size of the Grid</value>
 	public int MaxSize
 	{
 		get{return gridSizeX * gridSizeY;}
 	}
+	#endregion
 
+	#region CreateGrid
+	/// <summary>
+	/// Creates the grid using nodes
+	/// </summary>
 	void CreateGrid()
 	{
 		grid=new Node[gridSizeX,gridSizeY];
@@ -42,7 +66,14 @@ public class Grid : MonoBehaviour {
 			}
 		}
 	}
+	#endregion
 
+	#region GetNeighbors
+	/// <summary>
+	/// Gets the neighbors of the current node being checked
+	/// </summary>
+	/// <returns>The neighbors.</returns>
+	/// <param name="node">Node.</param>
 	public List<Node> GetNeighbors(Node node)
 	{
 		List<Node> neighbors = new List<Node>();
@@ -66,7 +97,14 @@ public class Grid : MonoBehaviour {
 
 		return neighbors;
 	}
+	#endregion
 
+	#region NodeFromWorldPoint
+	/// <summary>
+	/// Returns a Node from a given Vector 3 world point
+	/// </summary>
+	/// <returns>The Node from world point.</returns>
+	/// <param name="worldPosition">World position.</param>
 	public Node NodeFromWorldPoint(Vector3 worldPosition)
 	{
 		float percentX = (worldPosition.x + gridWorldSize.x/2) / gridWorldSize.x;
@@ -80,7 +118,16 @@ public class Grid : MonoBehaviour {
 
 		return grid[x,y];
 	}
+	#endregion
 
+	#region OnDrawGizmos
+	/// <summary>
+	/// Draws gizmos on screen as wire cubes to 
+	/// represent walkable and unwalkable spaces
+	/// on the grid.  Walkable are white unwalkable
+	/// are red.  This will only happen if drawingGizmos
+	/// public bool is true.
+	/// </summary>
 	void OnDrawGizmos()
 	{
 		if(drawingGizmos == true)
@@ -96,4 +143,5 @@ public class Grid : MonoBehaviour {
 			}
 		}
 	}
+	#endregion
 }

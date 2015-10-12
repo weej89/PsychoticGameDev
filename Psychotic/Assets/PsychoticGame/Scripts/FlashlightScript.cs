@@ -55,6 +55,11 @@ public class FlashlightScript : MonoBehaviour
 	#endregion
 
 	#region AddBatteryLife
+	/// <summary>
+	/// Adds the battery life to the flashlight from
+	/// a battery value using pickup
+	/// </summary>
+	/// <param name="battery">Battery.</param>
 	public void AddBatteryLife(float battery)
 	{
 		flashlightBattery += battery;

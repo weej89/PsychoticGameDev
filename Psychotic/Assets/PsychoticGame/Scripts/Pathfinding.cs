@@ -1,25 +1,50 @@
-﻿using System;
+﻿#region Using
+using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+#endregion
 
 public class Pathfinding : MonoBehaviour 
 {
+	#region Private Variables
 	PathRequestManager requestManager;
 	Grid grid;
+	#endregion
 
+	#region Awake
+	/// <summary>
+	/// Awake this instance.  Gets a PathRequestManager component
+	/// as well as a Grid component.
+	/// </summary>
 	void Awake()
 	{
 		requestManager = GetComponent<PathRequestManager>();
 		grid=GetComponent<Grid>();
 	}
+	#endregion
 
+	#region StartFindPath
+	/// <summary>
+	/// Starts a new Coroutine to Find a path with given
+	/// start and end point
+	/// </summary>
+	/// <param name="startPos">Start position.</param>
+	/// <param name="targetPos">Target position.</param>
 	public void StartFindPath(Vector3 startPos, Vector3 targetPos)
 	{
 		StartCoroutine(FindPath(startPos, targetPos));
 	}
+	#endregion
 
+	#region FindPath
+	/// <summary>
+	/// Enumerator used as Coroutine to find a path to target node
+	/// </summary>
+	/// <returns>The path.</returns>
+	/// <param name="startPos">Start position.</param>
+	/// <param name="targetPos">Target position.</param>
 	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
 	{
 		Stopwatch sw = new Stopwatch();
@@ -80,7 +105,17 @@ public class Pathfinding : MonoBehaviour
 		}
 		requestManager.FinishedProcessingPath(waypoints, pathSuccess);
 	}
+	#endregion
 
+	#region RetracePath
+	/// <summary>
+	/// Retraces the path through a start and end node
+	/// by using parent association and reverses the array
+	/// constructed before returning for use by the AI
+	/// </summary>
+	/// <returns>The path.</returns>
+	/// <param name="startNode">Start node.</param>
+	/// <param name="endNode">End node.</param>
 	Vector3[] RetracePath(Node startNode, Node endNode)
 	{
 		List<Node> path = new List<Node>();
@@ -96,7 +131,16 @@ public class Pathfinding : MonoBehaviour
 
 		return waypoints;
 	}
+	#endregion
 
+	#region SimplifyPath
+	/// <summary>
+	/// Smooths the path by making sure that there is not an
+	/// overabundance of nodes going in same direction all pointing
+	/// to each other.  Used for optimization puroposes
+	/// </summary>
+	/// <returns>The path.</returns>
+	/// <param name="path">Path.</param>
 	Vector3[] SimplifyPath(List<Node> path)
 	{
 		List<Vector3> waypoints = new List<Vector3>();
@@ -114,7 +158,16 @@ public class Pathfinding : MonoBehaviour
 
 		return waypoints.ToArray();
 	}
+	#endregion
 
+	#region GetDistance
+	/// <summary>
+	/// Gets the distance factor from one node to a next.
+	/// Used in computing A* fcost for the node
+	/// </summary>
+	/// <returns>The distance.</returns>
+	/// <param name="nodeA">Node a.</param>
+	/// <param name="nodeB">Node b.</param>
 	int GetDistance(Node nodeA, Node nodeB)
 	{
 		int distX = Mathf.Abs(nodeA.gridX - nodeB.gridX);
@@ -125,4 +178,5 @@ public class Pathfinding : MonoBehaviour
 		return 14 * distX + 10 * (distY - distX);
 
 	}
+	#endregion
 }

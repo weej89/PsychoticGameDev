@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
+#endregion
 
 public class HorrorAI : MonoBehaviour {
 
@@ -21,17 +23,35 @@ public class HorrorAI : MonoBehaviour {
 	private Vector3 direction;
 	#endregion
 
+	#region Start
+	/// <summary>
+	/// Start this instance.
+	/// Requests the first path for the AI
+	/// </summary>
 	void Start()
 	{
 		PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
 	}
+	#endregion
 
+	#region Update
+	/// <summary>
+	/// Update this instance.
+	/// If the target position has been reached
+	/// then start new path in random interval
+	/// </summary>
 	void Update()
 	{
 		if(targetReached == true)
 			CallForNewPath();
 	}
+	#endregion
 
+	#region CallForNewPath
+	/// <summary>
+	/// Calls for new path after a random time interval
+	/// has passed
+	/// </summary>
 	void CallForNewPath()
 	{
 		if(currentTime < interval)
@@ -43,7 +63,15 @@ public class HorrorAI : MonoBehaviour {
 			PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
 		}
 	}
+	#endregion
 
+	#region OnPathFound
+	/// <summary>
+	/// If a path was obtained using coordinates then
+	/// start a new Coroutine that follows the new path
+	/// </summary>
+	/// <param name="newPath">New path.</param>
+	/// <param name="pathSuccessful">If set to <c>true</c> path successful.</param>
 	public void OnPathFound(Vector3[] newPath, bool pathSuccessful)
 	{
 		if(pathSuccessful)
@@ -53,9 +81,16 @@ public class HorrorAI : MonoBehaviour {
 			StartCoroutine("FollowPath");
 		}
 	}
+	#endregion
 
+	#region FollowPath
+	/// <summary>
+	/// Enumerator used to follow path on a separate thread
+	/// </summary>
+	/// <returns>The path.</returns>
 	IEnumerator FollowPath()
 	{
+		//Check for actual path and yield return null if path is empty
 		Vector3 currentWaypoint = path[0];
 
 		while(true)
@@ -80,7 +115,13 @@ public class HorrorAI : MonoBehaviour {
 			yield return null;
 		}
 	}
+	#endregion
 
+	#region OnDrawGizmos
+	/// <summary>
+	/// Draws black cube gizmos linked by lines
+	/// along the current path of the AI
+	/// </summary>
 	public void OnDrawGizmos()
 	{
 		if(path!=null)
@@ -101,7 +142,17 @@ public class HorrorAI : MonoBehaviour {
 			}
 		}
 	}
+	#endregion
 
+	#region WithinOne
+	/// <summary>
+	/// Returns true is the current transform location is
+	/// within 1 unit of the target space.  This is used 
+	/// since animation causes transform to never exactly equal
+	/// target location.
+	/// </summary>
+	/// <returns><c>true</c>, if one was withined, <c>false</c> otherwise.</returns>
+	/// <param name="target">Target.</param>
 	bool WithinOne(Vector3 target)
 	{
 		if(Mathf.Abs(target.x - transform.position.x) < 1 && Mathf.Abs(target.z - transform.position.z) < 1)
@@ -109,7 +160,15 @@ public class HorrorAI : MonoBehaviour {
 		else
 			return false;
 	}
+	#endregion
 
+	#region GetNextRandomInterval
+	/// <summary>
+	/// Returns a Random interval of time according to a given
+	/// average using the Poisson Distribution Equation
+	/// </summary>
+	/// <returns>The next random interval.</returns>
+	/// <param name="avg">Avg.</param>
 	public double GetNextRandomInterval(double avg)
 	{
 		avg = (1/avg);
@@ -117,4 +176,5 @@ public class HorrorAI : MonoBehaviour {
 		print ("Interval: "+interval);
 		return interval;
 	}
+	#endregion
 }

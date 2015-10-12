@@ -13,7 +13,9 @@ public class BatteryDetails : MonoBehaviour {
 	#endregion
 
 	#region Start
-	// Use this for initialization
+	/// <summary>
+	/// Start this instance and get a battery charge value
+	/// </summary>
 	void Start () 
 	{
 		randMin = 25;
@@ -24,6 +26,10 @@ public class BatteryDetails : MonoBehaviour {
 	#endregion
 
 	#region GetBatteryValue
+	/// <summary>
+	/// Gets the battery value.
+	/// </summary>
+	/// <returns>The battery value.</returns>
 	public float GetBatteryValue()
 	{
 		return batteryValue;
