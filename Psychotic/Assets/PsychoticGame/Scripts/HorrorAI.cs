@@ -3,7 +3,16 @@ using UnityEngine;
 using System.Collections;
 #endregion
 
-public class HorrorAI : MonoBehaviour {
+public class HorrorAI : MonoBehaviour
+{
+
+	#region Public Hidden Variables
+	[HideInInspector]
+	public const float DEFAULT_WALKING_SPEED = 2;
+	public const float DEFUALT_RUNNING_SPEED = 4;
+	public bool targetReached = false;
+	public double interval;
+	#endregion
 
 	#region Public Variables
 	public Transform target;
@@ -16,9 +25,6 @@ public class HorrorAI : MonoBehaviour {
 	Vector3[] path;
 	int targetIndex;
 	double currentTime = 0;
-	double interval;
-	bool targetReached = false;
-
 	private Quaternion lookRotation;
 	private Vector3 direction;
 	#endregion
@@ -28,9 +34,9 @@ public class HorrorAI : MonoBehaviour {
 	/// Start this instance.
 	/// Requests the first path for the AI
 	/// </summary>
-	void Start()
+	void Start ()
 	{
-		PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+		PathRequestManager.RequestPath (transform.position, target.position, OnPathFound);
 	}
 	#endregion
 
@@ -40,10 +46,9 @@ public class HorrorAI : MonoBehaviour {
 	/// If the target position has been reached
 	/// then start new path in random interval
 	/// </summary>
-	void Update()
+	void Update ()
 	{
-		if(targetReached == true)
-			CallForNewPath();
+
 	}
 	#endregion
 
@@ -52,16 +57,9 @@ public class HorrorAI : MonoBehaviour {
 	/// Calls for new path after a random time interval
 	/// has passed
 	/// </summary>
-	void CallForNewPath()
+	public void CallForNewPath (Transform newTarget)
 	{
-		if(currentTime < interval)
-			currentTime += Time.deltaTime;
-		else
-		{
-			targetReached = false;
-			currentTime = 0;
-			PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
-		}
+		PathRequestManager.RequestPath (transform.position, newTarget.position, OnPathFound);
 	}
 	#endregion
 
@@ -72,13 +70,14 @@ public class HorrorAI : MonoBehaviour {
 	/// </summary>
 	/// <param name="newPath">New path.</param>
 	/// <param name="pathSuccessful">If set to <c>true</c> path successful.</param>
-	public void OnPathFound(Vector3[] newPath, bool pathSuccessful)
+	public void OnPathFound (Vector3[] newPath, bool pathSuccessful)
 	{
-		if(pathSuccessful)
+		if (pathSuccessful) 
 		{
 			path = newPath;
-			StopCoroutine("FollowPath");
-			StartCoroutine("FollowPath");
+			targetReached = false;
+			StopCoroutine ("FollowPath");
+			StartCoroutine ("FollowPath");
 		}
 	}
 	#endregion
@@ -88,30 +87,23 @@ public class HorrorAI : MonoBehaviour {
 	/// Enumerator used to follow path on a separate thread
 	/// </summary>
 	/// <returns>The path.</returns>
-	IEnumerator FollowPath()
+	IEnumerator FollowPath ()
 	{
 		//Check for actual path and yield return null if path is empty
-		Vector3 currentWaypoint = path[0];
+		Vector3 currentWaypoint = path [0];
 
-		while(true)
-		{
-			if(WithinOne(currentWaypoint))
-			{
+		while (true) {
+			if (WithinOne (currentWaypoint)) {
 				targetIndex++;
-				if(targetIndex >= path.Length)
-				{
+				if (targetIndex >= path.Length) {
 					targetReached = true;
-					interval = GetNextRandomInterval(newPathAvgTime);
-					targetIndex=0;
+					targetIndex = 0;
 					yield break;
 				}
-				currentWaypoint = path[targetIndex];
+				currentWaypoint = path [targetIndex];
 			}
 
-			direction = (currentWaypoint - transform.position).normalized;
-			lookRotation = Quaternion.LookRotation(direction);
-			transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-			transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
+			PerformRotation(currentWaypoint);
 			yield return null;
 		}
 	}
@@ -122,22 +114,17 @@ public class HorrorAI : MonoBehaviour {
 	/// Draws black cube gizmos linked by lines
 	/// along the current path of the AI
 	/// </summary>
-	public void OnDrawGizmos()
+	public void OnDrawGizmos ()
 	{
-		if(path!=null)
-		{
-			for(int i = targetIndex; i<path.Length; i++)
-			{
+		if (path != null) {
+			for (int i = targetIndex; i<path.Length; i++) {
 				Gizmos.color = Color.black;
-				Gizmos.DrawCube(path[i], Vector3.one);
+				Gizmos.DrawCube (path [i], Vector3.one);
 
-				if(i == targetIndex)
-				{
-					Gizmos.DrawLine(transform.position, path[i]);
-				}
-				else
-				{
-					Gizmos.DrawLine(path[i-1], path[i]);
+				if (i == targetIndex) {
+					Gizmos.DrawLine (transform.position, path [i]);
+				} else {
+					Gizmos.DrawLine (path [i - 1], path [i]);
 				}
 			}
 		}
@@ -153,28 +140,20 @@ public class HorrorAI : MonoBehaviour {
 	/// </summary>
 	/// <returns><c>true</c>, if one was withined, <c>false</c> otherwise.</returns>
 	/// <param name="target">Target.</param>
-	bool WithinOne(Vector3 target)
+	bool WithinOne (Vector3 target)
 	{
-		if(Mathf.Abs(target.x - transform.position.x) < 1 && Mathf.Abs(target.z - transform.position.z) < 1)
+		if (Mathf.Abs (target.x - transform.position.x) < 1 && Mathf.Abs (target.z - transform.position.z) < 1)
 			return true;
 		else
 			return false;
 	}
 	#endregion
 
-	#region GetNextRandomInterval
-	/// <summary>
-	/// Returns a Random interval of time according to a given
-	/// average using the Poisson Distribution Equation
-	/// </summary>
-	/// <returns>The next random interval.</returns>
-	/// <param name="avg">Avg.</param>
-	public double GetNextRandomInterval(double avg)
+	public void PerformRotation(Vector3 currentWaypoint)
 	{
-		avg = (1/avg);
-		double interval = -Mathf.Log((float)(1.0 - Random.value)) / avg;
-		print ("Interval: "+interval);
-		return interval;
+		direction = (currentWaypoint - transform.position).normalized;
+		lookRotation = Quaternion.LookRotation (direction);
+		transform.rotation = Quaternion.Slerp (transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+		transform.position = Vector3.MoveTowards (transform.position, currentWaypoint, speed * Time.deltaTime);
 	}
-	#endregion
 }
