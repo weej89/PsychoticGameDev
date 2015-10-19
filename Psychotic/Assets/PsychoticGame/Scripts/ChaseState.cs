@@ -29,7 +29,7 @@ public class ChaseState : IEnemyState
 		
 	}
 
-	public void ToCheckingState(float interval, List<Node> nodesToCheck)
+	public void ToCheckingState(float interval)
 	{
 		
 	}
@@ -61,6 +61,6 @@ public class ChaseState : IEnemyState
 	private void Chase()
 	{
 		//Set chase target in pathfinding
-		zombie.CallForNewPath(enemy.chaseTarget);
+		zombie.CallForNewPath(enemy.chaseTarget.transform.position);
 	}
 }

@@ -12,7 +12,7 @@ public interface IEnemyState
 
 	void ToPatrolState();
 
-	void ToCheckingState(float interval, List<Node> nodesToCheck);
+	void ToCheckingState(float interval);
 
 	void ToAlertState();
 

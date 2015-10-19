@@ -30,9 +30,10 @@ public class PatrolState : IEnemyState
 		Debug.Log("Can't transition to same state");
 	}
 
-	public void ToCheckingState(float interval, List<Node> nodesToCheck)
+	public void ToCheckingState(float interval)
 	{
-
+		enemy.UpdateCheckingState(interval);
+		enemy.currentState = enemy.checkingState;
 	}
 	
 	public void ToAlertState()
@@ -49,7 +50,7 @@ public class PatrolState : IEnemyState
 	{
 		RaycastHit hit;
 
-		if(Physics.Raycast(enemy.eyes.transform.position, enemy.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
+		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{
 			enemy.chaseTarget = hit.transform;
 			ToChaseState();
@@ -63,6 +64,7 @@ public class PatrolState : IEnemyState
 		if(zombie.targetReached)
 		{
 			zombie.interval = GetNextRandomInterval(zombie.newPathAvgTime);
+			ToCheckingState((float)zombie.interval);
 		}
 	}
 

@@ -57,9 +57,9 @@ public class HorrorAI : MonoBehaviour
 	/// Calls for new path after a random time interval
 	/// has passed
 	/// </summary>
-	public void CallForNewPath (Transform newTarget)
+	public void CallForNewPath (Vector3 newTarget)
 	{
-		PathRequestManager.RequestPath (transform.position, newTarget.position, OnPathFound);
+		PathRequestManager.RequestPath (transform.position, newTarget, OnPathFound);
 	}
 	#endregion
 

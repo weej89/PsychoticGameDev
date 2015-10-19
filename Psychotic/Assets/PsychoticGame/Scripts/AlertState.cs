@@ -24,13 +24,14 @@ public class AlertState : IEnemyState
 	
 	public void ToPatrolState()
 	{
+		enemy.GeneratePatrolPath();
 		enemy.currentState = enemy.patrolState;
 		searchTimer = 0f;
 	}
 
-	public void ToCheckingState(float interval, List<Node> nodesToCheck)
+	public void ToCheckingState(float interval)
 	{
-		
+
 	}
 	
 	public void ToAlertState()
@@ -48,7 +49,7 @@ public class AlertState : IEnemyState
 	{
 		RaycastHit hit;
 		
-		if(Physics.Raycast(enemy.eyes.transform.position, enemy.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
+		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{
 			enemy.chaseTarget = hit.transform;
 			ToChaseState();
