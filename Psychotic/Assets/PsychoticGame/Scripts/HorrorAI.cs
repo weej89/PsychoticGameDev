@@ -19,6 +19,7 @@ public class HorrorAI : MonoBehaviour
 	public float speed = 2;
 	public double newPathAvgTime;
 	public float rotationSpeed;
+	public Transform eyes;
 	#endregion
 
 	#region Private Variables
@@ -103,7 +104,8 @@ public class HorrorAI : MonoBehaviour
 				currentWaypoint = path [targetIndex];
 			}
 
-			PerformRotation(currentWaypoint);
+			PerformRotation(eyes.transform, currentWaypoint);
+			PerformRotation(this.transform, currentWaypoint);
 			yield return null;
 		}
 	}
@@ -149,11 +151,11 @@ public class HorrorAI : MonoBehaviour
 	}
 	#endregion
 
-	public void PerformRotation(Vector3 currentWaypoint)
+	public void PerformRotation(Transform trans, Vector3 currentWaypoint)
 	{
-		direction = (currentWaypoint - transform.position).normalized;
+		direction = (currentWaypoint - trans.position).normalized;
 		lookRotation = Quaternion.LookRotation (direction);
-		transform.rotation = Quaternion.Slerp (transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-		transform.position = Vector3.MoveTowards (transform.position, currentWaypoint, speed * Time.deltaTime);
+		trans.rotation = Quaternion.Slerp (trans.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+		trans.position = Vector3.MoveTowards (trans.position, currentWaypoint, speed * Time.deltaTime);
 	}
 }
