@@ -58,7 +58,7 @@ public class CheckingState : IEnemyState
 	private void Look()
 	{
 		RaycastHit hit;
-		Debug.DrawLine(enemy.eyes.transform.position, new Vector3(enemy.eyes.transform.forward.x, enemy.eyes.transform.forward.y, enemy.eyes.transform.forward.z + enemy.sightRange));
+		//Debug.DrawLine(enemy.transform.position, zombie.transform.forward);
 
 		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{

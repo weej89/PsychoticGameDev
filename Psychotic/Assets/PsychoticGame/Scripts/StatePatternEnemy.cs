@@ -12,6 +12,7 @@ public class StatePatternEnemy : MonoBehaviour
 	public MeshRenderer meshRendererFlag;
 	public TargetArea targetArea;
 	public float targetAreaRadius = 50f;
+	public Transform seeker;
 
 	[HideInInspector] public Transform chaseTarget;
 	[HideInInspector] public IEnemyState currentState;
@@ -29,11 +30,6 @@ public class StatePatternEnemy : MonoBehaviour
 		enemy = GetComponent<HorrorAI>();
 		grid = pathFinding.GetComponent<Grid>();
 
-		if(grid == null)
-		{
-			print("This sucks");
-		}
-
 		chaseState = new ChaseState(this, enemy);
 		alertState = new AlertState(this);
 		patrolState = new PatrolState(this, enemy);
@@ -49,6 +45,7 @@ public class StatePatternEnemy : MonoBehaviour
 	void Update () 
 	{
 		currentState.UpdateState();
+		Debug.DrawRay(eyes.transform.position, eyes.transform.forward, Color.white, 1.0f);
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -66,5 +63,15 @@ public class StatePatternEnemy : MonoBehaviour
 	public void UpdateCheckingState(float interval)
 	{
 		checkingState = new CheckingState(this, enemy, interval, targetArea.SearchList);
+	}
+
+	public void OnDrawGizmos()
+	{
+		foreach(Node node in targetArea.nodeList)
+		{
+			Gizmos.color = Color.blue;
+			Gizmos.DrawCube(node.worldPosition, Vector3.one);
+		}
+
 	}
 }

@@ -49,7 +49,7 @@ public class HorrorAI : MonoBehaviour
 	/// </summary>
 	void Update ()
 	{
-
+		//Debug.DrawRay(transform.position, transform.forward, Color.white, 1.0f);
 	}
 	#endregion
 
@@ -104,8 +104,9 @@ public class HorrorAI : MonoBehaviour
 				currentWaypoint = path [targetIndex];
 			}
 
-			PerformRotation(eyes.transform, currentWaypoint);
 			PerformRotation(this.transform, currentWaypoint);
+			transform.position = Vector3.MoveTowards (transform.position, currentWaypoint, speed * Time.deltaTime);
+
 			yield return null;
 		}
 	}
@@ -153,9 +154,11 @@ public class HorrorAI : MonoBehaviour
 
 	public void PerformRotation(Transform trans, Vector3 currentWaypoint)
 	{
+		/*
 		direction = (currentWaypoint - trans.position).normalized;
 		lookRotation = Quaternion.LookRotation (direction);
 		trans.rotation = Quaternion.Slerp (trans.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-		trans.position = Vector3.MoveTowards (trans.position, currentWaypoint, speed * Time.deltaTime);
+		*/
+		this.transform.LookAt(currentWaypoint, new Vector3(0, .5f, 0) );
 	}
 }

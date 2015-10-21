@@ -61,6 +61,7 @@ public class ChaseState : IEnemyState
 	private void Chase()
 	{
 		//Set chase target in pathfinding
-		zombie.CallForNewPath(enemy.chaseTarget.transform.position);
+		if(zombie.targetReached)
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position);
 	}
 }

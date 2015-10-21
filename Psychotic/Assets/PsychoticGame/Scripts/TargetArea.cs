@@ -6,7 +6,7 @@ public class TargetArea {
 
 	private List<Node> searchList;
 
-	List<Node> nodeList;
+	public List<Node> nodeList;
 	Grid grid;
 	Vector3 center;
 	float radius;
