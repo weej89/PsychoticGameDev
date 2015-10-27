@@ -4,18 +4,10 @@ using System.Collections.Generic;
 
 public class TargetArea {
 
-	private List<Node> searchList;
-
 	public List<Node> nodeList;
 	Grid grid;
 	Vector3 center;
 	float radius;
-	double area;
-
-	public List<Node> SearchList
-	{
-		get{return searchList;}
-	}
 
 	public TargetArea(Grid _grid, Vector3 _center, float _radius)
 	{
@@ -23,8 +15,8 @@ public class TargetArea {
 		radius = _radius;
 		grid = _grid;
 
-		this.area = Mathf.PI * Mathf.Pow(radius, 2);
 		this.nodeList = new List<Node>();
+		CreatePossibleTargetList();
 	}
 
 	private void AddNodeFromWorldPoint(Vector3 worldPoint)
@@ -35,31 +27,30 @@ public class TargetArea {
 			nodeList.Add(node);
 	}
 
-	public List<Node> GenerateCheckingPath(int numPoints)
+	public Vector3 GenerateCheckingPath()
 	{
-		CreatePossibleTargetList();
-		searchList = new List<Node>();
-
-		for(int i = 0; i < numPoints; i++)
+		if(nodeList.Count > 0)
 		{
 			int index = Random.Range(0, nodeList.Count-1);
-			searchList.Add(nodeList[index]);
+			Node node = nodeList[index];
 			nodeList.RemoveAt(index);
-		}
 
-		return searchList;
+			return node.worldPosition;
+		}
+		else
+			return new Vector3(-1, -1, -1);
 	}
 
 	private void CreatePossibleTargetList()
 	{
 		for(float x = (center.x - radius); x <= center.x; x++)
 		{
-			for(float y = (center.y - radius); y <= center.y; y++)
+			for(float y = (center.z - radius); y <= center.z; y++)
 			{
-				if((x - center.x)*(x - center.x) + (y - center.y)*(y-center.y) <= radius * radius)
+				if((x - center.x)*(x - center.x) + (y - center.z)*(y-center.z) <= radius * radius)
 				{
 					float xSym = (int)(center.x - (x - center.x));
-					float ySym = (int)(center.y - (y - center.y));
+					float ySym = (int)(center.z - (y - center.z));
 
 					AddNodeFromWorldPoint(new Vector3(x, 0, y));
 					AddNodeFromWorldPoint(new Vector3(x, 0, ySym));

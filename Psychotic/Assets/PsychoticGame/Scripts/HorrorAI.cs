@@ -10,7 +10,6 @@ public class HorrorAI : MonoBehaviour
 	[HideInInspector]
 	public const float DEFAULT_WALKING_SPEED = 2;
 	public const float DEFUALT_RUNNING_SPEED = 4;
-	public bool targetReached = false;
 	public double interval;
 	#endregion
 
@@ -25,9 +24,21 @@ public class HorrorAI : MonoBehaviour
 	#region Private Variables
 	Vector3[] path;
 	int targetIndex;
-	double currentTime = 0;
 	private Quaternion lookRotation;
 	private Vector3 direction;
+	private bool  targetReached = true;
+	#endregion
+
+	#region Public Fields
+	public int PathCount
+	{
+		get{return path.Length;}
+	}
+
+	public bool TargetReached
+	{
+		get{return targetReached;}
+	}
 	#endregion
 
 	#region Start
@@ -37,7 +48,8 @@ public class HorrorAI : MonoBehaviour
 	/// </summary>
 	void Start ()
 	{
-		PathRequestManager.RequestPath (transform.position, target.position, OnPathFound);
+		path = new Vector3[0];
+		//PathRequestManager.RequestPath (transform.position, target.position, OnPathFound);
 	}
 	#endregion
 
@@ -49,7 +61,7 @@ public class HorrorAI : MonoBehaviour
 	/// </summary>
 	void Update ()
 	{
-		//Debug.DrawRay(transform.position, transform.forward, Color.white, 1.0f);
+
 	}
 	#endregion
 
@@ -154,11 +166,10 @@ public class HorrorAI : MonoBehaviour
 
 	public void PerformRotation(Transform trans, Vector3 currentWaypoint)
 	{
-		/*
+
 		direction = (currentWaypoint - trans.position).normalized;
 		lookRotation = Quaternion.LookRotation (direction);
 		trans.rotation = Quaternion.Slerp (trans.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-		*/
-		this.transform.LookAt(currentWaypoint, new Vector3(0, .5f, 0) );
+
 	}
 }

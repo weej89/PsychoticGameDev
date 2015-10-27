@@ -15,6 +15,7 @@ public class ChaseState : IEnemyState
 
 	public void UpdateState()
 	{
+		Debug.Log("IN CHASE");
 		Look();
 		Chase ();
 	}
@@ -25,11 +26,6 @@ public class ChaseState : IEnemyState
 	}
 	
 	public void ToPatrolState()
-	{
-		
-	}
-
-	public void ToCheckingState(float interval)
 	{
 		
 	}
@@ -61,7 +57,7 @@ public class ChaseState : IEnemyState
 	private void Chase()
 	{
 		//Set chase target in pathfinding
-		if(zombie.targetReached)
+		if(zombie.TargetReached)
 			zombie.CallForNewPath(enemy.chaseTarget.transform.position);
 	}
 }

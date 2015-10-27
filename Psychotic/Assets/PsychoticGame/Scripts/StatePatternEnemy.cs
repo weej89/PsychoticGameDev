@@ -6,6 +6,7 @@ public class StatePatternEnemy : MonoBehaviour
 	public float searchingTurnSpeed = 120f;
 	public float searchingDuration = 4f;
 	public float sightRange = 20f;
+	public double avgPatrolInterval = 15;
 	public Transform[] wayPoints;
 	public Transform eyes;
 	public Vector3 offset = new Vector3 (0, .5f, 0);
@@ -13,13 +14,12 @@ public class StatePatternEnemy : MonoBehaviour
 	public TargetArea targetArea;
 	public float targetAreaRadius = 50f;
 	public Transform seeker;
-
+	
 	[HideInInspector] public Transform chaseTarget;
 	[HideInInspector] public IEnemyState currentState;
 	[HideInInspector] public ChaseState chaseState;
 	[HideInInspector] public AlertState alertState;
 	[HideInInspector] public PatrolState patrolState;
-	[HideInInspector] public CheckingState checkingState;
 
 	private HorrorAI enemy;
 	private Grid grid;
@@ -31,13 +31,14 @@ public class StatePatternEnemy : MonoBehaviour
 		grid = pathFinding.GetComponent<Grid>();
 
 		chaseState = new ChaseState(this, enemy);
-		alertState = new AlertState(this);
-		patrolState = new PatrolState(this, enemy);
+		alertState = new AlertState(this, enemy);
+		patrolState = new PatrolState(this, enemy, grid);
+
 	}
 	// Use this for initialization
 	void Start () 
 	{
-		GeneratePatrolPath();
+		patrolState.GetPatrolPoint(15.0);
 		currentState = patrolState;	
 	}
 	
@@ -53,25 +54,17 @@ public class StatePatternEnemy : MonoBehaviour
 		currentState.OnTriggerEnter(other);
 	}
 
-	public void GeneratePatrolPath()
-	{
-		targetArea = new TargetArea(grid, enemy.target.transform.position, targetAreaRadius);
-		targetArea.GenerateCheckingPath(Random.Range(2, 5));
-		enemy.CallForNewPath(targetArea.SearchList[0].worldPosition);
-	}
-
-	public void UpdateCheckingState(float interval)
-	{
-		checkingState = new CheckingState(this, enemy, interval, targetArea.SearchList);
-	}
-
+	/*
 	public void OnDrawGizmos()
 	{
-		foreach(Node node in targetArea.nodeList)
+		if(targetArea != null)
 		{
-			Gizmos.color = Color.blue;
-			Gizmos.DrawCube(node.worldPosition, Vector3.one);
+			foreach(Node node in targetArea.nodeList)
+			{
+				Gizmos.color = Color.blue;
+				Gizmos.DrawCube(node.worldPosition, Vector3.one);
+			}
 		}
-
 	}
+	*/
 }

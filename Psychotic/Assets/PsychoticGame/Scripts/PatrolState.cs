@@ -6,15 +6,22 @@ public class PatrolState : IEnemyState
 {
 	private readonly StatePatternEnemy enemy;
 	private HorrorAI zombie;
+	private double patrolTime;
+	private double currentTime = 0;
+	private Grid grid;
 
-	public PatrolState(StatePatternEnemy statePatternEnemy, HorrorAI zombie)
+	private TargetArea targetArea;
+
+	public PatrolState(StatePatternEnemy statePatternEnemy, HorrorAI zombie, Grid grid)
 	{
 		this.enemy = statePatternEnemy;
 		this.zombie = zombie;
+		this.grid = grid;
 	}
 
 	public void UpdateState()
 	{
+		Debug.Log("IN PATROL");
 		Look();
 		Patrol();
 	}
@@ -29,12 +36,6 @@ public class PatrolState : IEnemyState
 	{
 		Debug.Log("Can't transition to same state");
 	}
-
-	public void ToCheckingState(float interval)
-	{
-		enemy.UpdateCheckingState(interval);
-		enemy.currentState = enemy.checkingState;
-	}
 	
 	public void ToAlertState()
 	{
@@ -46,14 +47,21 @@ public class PatrolState : IEnemyState
 		enemy.currentState = enemy.chaseState;
 	}
 
+	public void GetPatrolPoint(double avgInterval)
+	{
+		patrolTime = GetNextRandomInterval(avgInterval) * avgInterval;
+		targetArea = new TargetArea(grid, zombie.target.position, enemy.targetAreaRadius);
+		currentTime = 0;
+	}
+
 	private void Look()
 	{
 		RaycastHit hit;
 		
 		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{
-			Debug.DrawLine(enemy.eyes.transform.position, new Vector3(enemy.eyes.transform.forward.x, enemy.eyes.transform.forward.y, enemy.eyes.transform.forward.z + enemy.sightRange));
 			enemy.chaseTarget = hit.transform;
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position);
 			ToChaseState();
 		}
 	}
@@ -62,10 +70,25 @@ public class PatrolState : IEnemyState
 	{
 		//Add patrolling code here for pathfinding
 		//Add decision tree stuff here for determining behaviors
-		if(zombie.targetReached)
+		if(zombie.TargetReached && currentTime < patrolTime)
 		{
-			zombie.interval = GetNextRandomInterval(zombie.newPathAvgTime);
-			ToCheckingState((float)zombie.interval);
+				Vector3 target = targetArea.GenerateCheckingPath();
+
+				PathRequestManager.RequestPath(enemy.transform.position, target, (Vector3[] path, bool success) => {
+					if(success == true)
+					{
+						Debug.Log("Path found!");
+						zombie.OnPathFound(path, true);
+					}
+				});
+		}
+		else if (currentTime > patrolTime)
+		{
+			GetPatrolPoint(enemy.avgPatrolInterval);
+		}
+		else
+		{
+			currentTime += Time.deltaTime;
 		}
 	}
 

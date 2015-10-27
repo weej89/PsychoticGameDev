@@ -6,15 +6,19 @@ public class AlertState : IEnemyState
 {
 	private readonly StatePatternEnemy enemy;
 	private float searchTimer = 0f;
+	private HorrorAI zombie;
 	
-	public AlertState(StatePatternEnemy statePatternEnemy)
+	public AlertState(StatePatternEnemy statePatternEnemy, HorrorAI zombie)
 	{
 		this.enemy = statePatternEnemy;
+		this.zombie = zombie;
 	}
 
 	public void UpdateState()
 	{
+		Debug.Log("IN ALERT");
 		Look();
+		Search();
 	}
 	
 	public void OnTriggerEnter(Collider other)
@@ -24,14 +28,9 @@ public class AlertState : IEnemyState
 	
 	public void ToPatrolState()
 	{
-		enemy.GeneratePatrolPath();
+		enemy.patrolState.GetNextRandomInterval(enemy.avgPatrolInterval);
 		enemy.currentState = enemy.patrolState;
 		searchTimer = 0f;
-	}
-
-	public void ToCheckingState(float interval)
-	{
-
 	}
 	
 	public void ToAlertState()
@@ -54,6 +53,8 @@ public class AlertState : IEnemyState
 			Debug.DrawLine(enemy.eyes.transform.position, new Vector3(enemy.eyes.transform.forward.x, enemy.eyes.transform.forward.y, enemy.eyes.transform.forward.z + enemy.sightRange));
 
 			enemy.chaseTarget = hit.transform;
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position);
+
 			ToChaseState();
 		}
 	}

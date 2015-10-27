@@ -11,9 +11,7 @@ public interface IEnemyState
 	void OnTriggerEnter(Collider other);
 
 	void ToPatrolState();
-
-	void ToCheckingState(float interval);
-
+	
 	void ToAlertState();
 
 	void ToChaseState();
