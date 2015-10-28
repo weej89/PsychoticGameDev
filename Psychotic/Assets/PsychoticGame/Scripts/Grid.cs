@@ -67,10 +67,21 @@ public class Grid : MonoBehaviour {
 
 		for(int x=0; x<gridSizeX; x++)
 		{
+			Node node;
+
 			for(int y=0; y<gridSizeY; y++)
 			{
 				Vector3 worldPoint=worldBottmLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
+
+				Collider [] colliders = Physics.OverlapSphere(worldPoint, nodeRadius);
+
 				bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
+
+				foreach(Collider hit in colliders)
+				{
+					if(hit.CompareTag("Wall"))
+						walkable = false;
+				}
 
 				int movementPenalty = 0;
 
@@ -113,7 +124,7 @@ public class Grid : MonoBehaviour {
 				if(checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
 				{
 					neighbors.Add(grid[checkX, checkY]);
-					DetermineMovementPenalty(grid[checkX, checkY]);
+					//DetermineMovementPenalty(grid[checkX, checkY]);
 				}
 			}
 		}

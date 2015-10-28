@@ -10,7 +10,7 @@ public class PatrolState : IEnemyState
 	private double currentTime = 0;
 	private Grid grid;
 
-	private TargetArea targetArea;
+	public TargetArea targetArea;
 
 	public PatrolState(StatePatternEnemy statePatternEnemy, HorrorAI zombie, Grid grid)
 	{
@@ -68,28 +68,32 @@ public class PatrolState : IEnemyState
 
 	void Patrol()
 	{
+		enemy.meshRendererFlag.material.color = Color.green;
 		//Add patrolling code here for pathfinding
 		//Add decision tree stuff here for determining behaviors
-		if(zombie.TargetReached && currentTime < patrolTime)
+		if(zombie.TargetReached && currentTime < patrolTime && PathRequestManager.IsProcessingPath == false)
 		{
 				Vector3 target = targetArea.GenerateCheckingPath();
-
+				
+			/*
 				PathRequestManager.RequestPath(enemy.transform.position, target, (Vector3[] path, bool success) => {
 					if(success == true)
 					{
 						Debug.Log("Path found!");
 						zombie.OnPathFound(path, true);
 					}
+					else
+						Debug.Log("Path Not Found!");
 				});
+			*/
+			PathRequestManager.RequestPath(zombie.transform.position, target, zombie.OnPathFound);
 		}
 		else if (currentTime > patrolTime)
 		{
 			GetPatrolPoint(enemy.avgPatrolInterval);
 		}
-		else
-		{
-			currentTime += Time.deltaTime;
-		}
+		
+		currentTime += Time.deltaTime;
 	}
 
 	#region GetNextRandomInterval

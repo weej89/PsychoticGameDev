@@ -57,7 +57,10 @@ public class ChaseState : IEnemyState
 	private void Chase()
 	{
 		//Set chase target in pathfinding
-		if(zombie.TargetReached)
+		enemy.meshRendererFlag.material.color = Color.red;
+
+		if(zombie.TargetReached && PathRequestManager.IsProcessingPath == false)
 			zombie.CallForNewPath(enemy.chaseTarget.transform.position);
+
 	}
 }

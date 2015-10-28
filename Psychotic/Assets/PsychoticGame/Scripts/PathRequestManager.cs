@@ -17,6 +17,11 @@ public class PathRequestManager : MonoBehaviour {
 	bool isProcessingPath;
 	#endregion
 
+	public static bool IsProcessingPath
+	{
+		get{return instance.isProcessingPath;}
+	}
+
 	#region Awake
 	/// <summary>
 	/// Awake this instance.

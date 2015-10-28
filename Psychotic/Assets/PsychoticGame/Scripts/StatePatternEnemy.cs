@@ -54,17 +54,17 @@ public class StatePatternEnemy : MonoBehaviour
 		currentState.OnTriggerEnter(other);
 	}
 
-	/*
+
 	public void OnDrawGizmos()
 	{
-		if(targetArea != null)
+		if(currentState != null && patrolState != null)
 		{
-			foreach(Node node in targetArea.nodeList)
+			foreach(Node node in patrolState.targetArea.nodeList)
 			{
 				Gizmos.color = Color.blue;
 				Gizmos.DrawCube(node.worldPosition, Vector3.one);
 			}
 		}
 	}
-	*/
+
 }

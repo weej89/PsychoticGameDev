@@ -157,7 +157,7 @@ public class HorrorAI : MonoBehaviour
 	/// <param name="target">Target.</param>
 	bool WithinOne (Vector3 target)
 	{
-		if (Mathf.Abs (target.x - transform.position.x) < 1 && Mathf.Abs (target.z - transform.position.z) < 1)
+		if (Mathf.Abs (target.x - transform.position.x) <= 1.5f && Mathf.Abs (target.z - transform.position.z) <= 1.5f)
 			return true;
 		else
 			return false;

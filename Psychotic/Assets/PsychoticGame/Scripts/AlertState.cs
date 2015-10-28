@@ -63,6 +63,8 @@ public class AlertState : IEnemyState
 	{
 		//Add new pathfinding stuff
 		//Rotate enemy towards player
+		enemy.meshRendererFlag.material.color = Color.yellow;
+
 		searchTimer += Time.deltaTime;
 
 		if(searchTimer >= enemy.searchingDuration)
