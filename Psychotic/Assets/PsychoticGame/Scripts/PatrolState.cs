@@ -40,11 +40,13 @@ public class PatrolState : IEnemyState
 	public void ToAlertState()
 	{
 		enemy.currentState = enemy.alertState;
+		zombie.speed = 0;
 	}
 	
 	public void ToChaseState()
 	{
 		enemy.currentState = enemy.chaseState;
+		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
 	}
 
 	public void GetPatrolPoint(double avgInterval)

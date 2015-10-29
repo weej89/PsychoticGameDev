@@ -20,6 +20,7 @@ public class StatePatternEnemy : MonoBehaviour
 	[HideInInspector] public ChaseState chaseState;
 	[HideInInspector] public AlertState alertState;
 	[HideInInspector] public PatrolState patrolState;
+	[HideInInspector] public Animator anim;
 
 	private HorrorAI enemy;
 	private Grid grid;
@@ -38,6 +39,7 @@ public class StatePatternEnemy : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
+		anim = GetComponent<Animator>();
 		patrolState.GetPatrolPoint(15.0);
 		currentState = patrolState;	
 	}
@@ -46,7 +48,7 @@ public class StatePatternEnemy : MonoBehaviour
 	void Update () 
 	{
 		currentState.UpdateState();
-		Debug.DrawRay(eyes.transform.position, eyes.transform.forward, Color.white, 1.0f);
+		//Debug.DrawRay(eyes.transform.position, eyes.transform.forward, Color.white, 1.0f);
 	}
 
 	private void OnTriggerEnter(Collider other)

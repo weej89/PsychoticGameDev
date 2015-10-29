@@ -33,6 +33,7 @@ public class ChaseState : IEnemyState
 	public void ToAlertState()
 	{
 		enemy.currentState = enemy.alertState;
+		zombie.speed = 0;
 	}
 	
 	public void ToChaseState()
@@ -44,6 +45,7 @@ public class ChaseState : IEnemyState
 	{
 		RaycastHit hit;
 		Vector3 enemyToTarget = (enemy.chaseTarget.position + enemy.offset) - enemy.eyes.transform.position;
+		Debug.DrawRay(enemy.eyes.transform.position, enemyToTarget, Color.red);
 		if(Physics.Raycast(enemy.eyes.transform.position, enemyToTarget, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{
 			enemy.chaseTarget = hit.transform;

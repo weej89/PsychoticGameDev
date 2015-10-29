@@ -31,6 +31,7 @@ public class AlertState : IEnemyState
 		enemy.patrolState.GetNextRandomInterval(enemy.avgPatrolInterval);
 		enemy.currentState = enemy.patrolState;
 		searchTimer = 0f;
+		zombie.speed = zombie.DEFAULT_WALKING_SPEED;
 	}
 	
 	public void ToAlertState()
@@ -42,6 +43,7 @@ public class AlertState : IEnemyState
 	{
 		enemy.currentState = enemy.chaseState;
 		searchTimer = 0f;
+		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
 	}
 
 	private void Look()

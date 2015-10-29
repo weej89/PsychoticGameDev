@@ -8,8 +8,8 @@ public class HorrorAI : MonoBehaviour
 
 	#region Public Hidden Variables
 	[HideInInspector]
-	public const float DEFAULT_WALKING_SPEED = 2;
-	public const float DEFUALT_RUNNING_SPEED = 4;
+	public float DEFAULT_WALKING_SPEED = 2.75f;
+	public float DEFUALT_RUNNING_SPEED = 4.0f;
 	public double interval;
 	#endregion
 
