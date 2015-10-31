@@ -42,6 +42,11 @@ public class Grid : MonoBehaviour {
 			walkableRegionsDictionary.Add((int)Mathf.Log(region.terrainMask.value, 2),region.terrainPenalty);
 		}
 		CreateGrid();
+
+		foreach(Node node in grid)
+		{
+			DetermineMovementPenalty(node);
+		}
 	}
 	#endregion
 
@@ -72,16 +77,8 @@ public class Grid : MonoBehaviour {
 			for(int y=0; y<gridSizeY; y++)
 			{
 				Vector3 worldPoint=worldBottmLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
-
-				Collider [] colliders = Physics.OverlapSphere(worldPoint, nodeRadius);
-
+			
 				bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
-
-				foreach(Collider hit in colliders)
-				{
-					if(hit.CompareTag("Wall"))
-						walkable = false;
-				}
 
 				int movementPenalty = 0;
 
@@ -99,6 +96,7 @@ public class Grid : MonoBehaviour {
 		}
 	}
 	#endregion
+
 
 	#region GetNeighbors
 	/// <summary>
@@ -135,27 +133,15 @@ public class Grid : MonoBehaviour {
 
 	public void DetermineMovementPenalty(Node node)
 	{
-		int movmentPenalty = 0;
-		
-		for(int x=-1; x<=1; x++)
+		int movementPenalty = 0;
+
+		foreach(Node n in GetNeighbors(node))
 		{
-			for(int y=-1; y<=1; y++)
-			{
-				if(x==0 && y==0)
-					continue;
-				
-				int checkX = node.gridX + x;
-				int checkY = node.gridY + y;
-				
-				if(checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
-				{
-					if(grid[checkX, checkY].walkable == false)
-						movmentPenalty += 5;
-				}
-			}
+			if(!n.walkable)
+				movementPenalty += 15;
 		}
 		
-		node.movementPenalty += movmentPenalty;
+		node.movementPenalty += movementPenalty;
 	}
 
 	#region NodeFromWorldPoint

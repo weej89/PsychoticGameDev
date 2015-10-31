@@ -44,7 +44,7 @@ public class Node : IHeapItem<Node> {
 	/// <value>The f cost.</value>
 	public int fCost
 	{
-		get{return gCost+hCost;}
+		get{return gCost+hCost+movementPenalty;}
 	}
 	#endregion
 

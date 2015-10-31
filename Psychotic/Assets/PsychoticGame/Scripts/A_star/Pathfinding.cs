@@ -10,6 +10,8 @@ public class Pathfinding : MonoBehaviour
 {
 	#region Private Variables
 	PathRequestManager requestManager;
+	HashSet<Node> hashSet;
+	Heap<Node> heap;
 	Grid grid;
 	#endregion
 
@@ -60,8 +62,12 @@ public class Pathfinding : MonoBehaviour
 		{
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node>();
-			openSet.Add(startNode);
 
+			//heap = openSet;
+			//hashSet = closedSet;
+
+			openSet.Add(startNode);
+			
 			while (openSet.Count>0)
 			{
 				Node currentNode=openSet.RemoveFirst();
@@ -182,4 +188,16 @@ public class Pathfinding : MonoBehaviour
 
 	}
 	#endregion
+
+	void OnDrawGizmos()
+	{
+		if(hashSet != null && heap != null)
+		{
+			foreach(Node node in hashSet)
+			{
+				Gizmos.color = Color.yellow;
+				Gizmos.DrawCube(node.worldPosition, Vector3.one);
+			}
+		}
+	}
 }
