@@ -63,7 +63,7 @@ public class PatrolState : IEnemyState
 		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{
 			enemy.chaseTarget = hit.transform;
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position);
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*");
 			ToChaseState();
 		}
 	}
@@ -88,7 +88,7 @@ public class PatrolState : IEnemyState
 						Debug.Log("Path Not Found!");
 				});
 			*/
-			PathRequestManager.RequestPath(zombie.transform.position, target, zombie.OnPathFound);
+			PathRequestManager.RequestPath(zombie.transform.position, target, zombie.OnPathFound, "DepthFirst");
 		}
 		else if (currentTime > patrolTime)
 		{

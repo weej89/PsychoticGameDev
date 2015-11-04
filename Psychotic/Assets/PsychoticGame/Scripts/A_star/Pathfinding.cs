@@ -34,9 +34,9 @@ public class Pathfinding : MonoBehaviour
 	/// </summary>
 	/// <param name="startPos">Start position.</param>
 	/// <param name="targetPos">Target position.</param>
-	public void StartFindPath(Vector3 startPos, Vector3 targetPos)
+	public void StartFindPath(Vector3 startPos, Vector3 targetPos, string pathType)
 	{
-		StartCoroutine(FindPath(startPos, targetPos));
+		StartCoroutine(FindPath(startPos, targetPos, pathType));
 	}
 	#endregion
 
@@ -47,32 +47,49 @@ public class Pathfinding : MonoBehaviour
 	/// <returns>The path.</returns>
 	/// <param name="startPos">Start position.</param>
 	/// <param name="targetPos">Target position.</param>
-	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos)
+	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, string pathfindingType)
+	{
+		switch (pathfindingType)
+		{
+			case "A*":
+			AStarPathfinding(startPos, targetPos);
+			break;
+			case "DepthFirst":
+			FindPathNew(startPos, targetPos);
+			break;
+		}
+
+		yield return null;
+	}
+	#endregion
+
+	#region A* Pathfinding
+	IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos)
 	{
 		Stopwatch sw = new Stopwatch();
 		sw.Start();
-
+		
 		Vector3 [] waypoints = new Vector3[0];
 		bool pathSuccess = false;
-
+		
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint (targetPos);
-
+		
 		if(targetNode.walkable)
 		{
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node>();
-
+			
 			//heap = openSet;
 			//hashSet = closedSet;
-
+			
 			openSet.Add(startNode);
 			
 			while (openSet.Count>0)
 			{
 				Node currentNode=openSet.RemoveFirst();
 				closedSet.Add(currentNode);
-
+				
 				if(currentNode==targetNode)
 				{
 					sw.Stop();
@@ -80,21 +97,21 @@ public class Pathfinding : MonoBehaviour
 					//print("Path found: " +sw.ElapsedMilliseconds+ " ms");
 					break;
 				}
-
+				
 				foreach(Node neighbor in grid.GetNeighbors(currentNode))
 				{
 					if(!neighbor.walkable || closedSet.Contains(neighbor))
 					{
 						continue;
 					}
-
+					
 					int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
 					if(newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
 					{
 						neighbor.gCost = newMovementCostToNeighbor;
 						neighbor.hCost = GetDistance(neighbor, targetNode);
 						neighbor.parent = currentNode;
-
+						
 						if(!openSet.Contains(neighbor))
 							openSet.Add(neighbor);
 						else
@@ -104,12 +121,74 @@ public class Pathfinding : MonoBehaviour
 			}
 		}
 		yield return null;
-
+		
 		if(pathSuccess)
 		{
 			waypoints = RetracePath(startNode, targetNode);
 		}
 		requestManager.FinishedProcessingPath(waypoints, pathSuccess);
+	}
+	#endregion
+
+	#region NewPathfinding
+	IEnumerator FindPathNew(Vector3 startPoint, Vector3 targetPos)
+	{
+		Stack<Node> depthStack = new Stack<Node>();
+		HashSet<Node> visitedNodes = new HashSet<Node>();
+		Vector3[] waypoints = new Vector3[0];
+
+		Node startNode = grid.NodeFromWorldPoint(startPoint);
+		Node targetNode = grid.NodeFromWorldPoint(targetPos);
+
+		Node currentNode;
+
+		visitedNodes.Add(startNode);
+		depthStack.Push(startNode);
+
+		if(DepthFirst(depthStack, visitedNodes, targetNode))
+		{
+			List<Node> pathNodes = depthStack.ToArray();
+
+			while(depthStack.Count > 0)
+			{
+				pathNodes.Add(depthStack.Pop());
+			}
+
+			requestManager.FinishedProcessingPath(waypoints, true);
+		}
+		else
+			requestManager.FinishedProcessingPath(waypoints, false);
+	}
+
+	bool DepthFirst(Stack<Node> depthStack, HashSet<Node> visitedNodes, Node target)
+	{
+		List<Node> sortList = new List<Node>();
+		bool targetFound = false;
+
+		foreach(Node node in grid.GetNeighbors(depthStack.Peek()))
+		{
+			if(node.walkable && !visitedNodes.Contains(node))
+			{
+				visitedNodes.Add(node);
+				sortList.Add(node);
+			}
+		}
+
+		sortList.Sort();
+
+		while(sortList.Count > 0)
+		{
+			sortList[0].parent = depthStack.Peek();
+			depthStack.Push(sortList[0]);
+			sortList.Remove(0);
+
+			targetFound = DepthFirst(depthStack.Peek(), visitedNodes, target);
+
+			if(targetFound)
+				return true;
+		}
+
+		return false;
 	}
 	#endregion
 

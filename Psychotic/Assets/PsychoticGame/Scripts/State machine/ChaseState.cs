@@ -62,7 +62,7 @@ public class ChaseState : IEnemyState
 		enemy.meshRendererFlag.material.color = Color.red;
 
 		if(zombie.TargetReached && PathRequestManager.IsProcessingPath == false)
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position);
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*");
 
 	}
 }
