@@ -10,8 +10,6 @@ public class Pathfinding : MonoBehaviour
 {
 	#region Private Variables
 	PathRequestManager requestManager;
-	HashSet<Node> hashSet;
-	Heap<Node> heap;
 	Grid grid;
 	#endregion
 
@@ -49,27 +47,32 @@ public class Pathfinding : MonoBehaviour
 	/// <param name="targetPos">Target position.</param>
 	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, string pathfindingType)
 	{
+		Vector3[] waypoints = new Vector3[0];
+		bool pathFound = false;
+
 		switch (pathfindingType)
 		{
 			case "A*":
-			AStarPathfinding(startPos, targetPos);
+			pathFound = AStarPathfinding(startPos, targetPos, ref waypoints);
 			break;
 			case "DepthFirst":
-			FindPathNew(startPos, targetPos);
+			pathFound = FindPathNew(startPos, targetPos, ref waypoints);
 			break;
 		}
 
 		yield return null;
+
+		requestManager.FinishedProcessingPath(waypoints, pathFound);
+
 	}
 	#endregion
 
 	#region A* Pathfinding
-	IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos)
+	bool AStarPathfinding(Vector3 startPos, Vector3 targetPos, ref Vector3[] waypoints)
 	{
 		Stopwatch sw = new Stopwatch();
 		sw.Start();
 		
-		Vector3 [] waypoints = new Vector3[0];
 		bool pathSuccess = false;
 		
 		Node startNode = grid.NodeFromWorldPoint(startPos);
@@ -79,9 +82,6 @@ public class Pathfinding : MonoBehaviour
 		{
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node>();
-			
-			//heap = openSet;
-			//hashSet = closedSet;
 			
 			openSet.Add(startNode);
 			
@@ -120,75 +120,66 @@ public class Pathfinding : MonoBehaviour
 				}
 			}
 		}
-		yield return null;
+		//yield return null;
 		
 		if(pathSuccess)
 		{
 			waypoints = RetracePath(startNode, targetNode);
 		}
-		requestManager.FinishedProcessingPath(waypoints, pathSuccess);
+
+		return pathSuccess;
 	}
 	#endregion
 
 	#region NewPathfinding
-	IEnumerator FindPathNew(Vector3 startPoint, Vector3 targetPos)
+	bool FindPathNew(Vector3 startPoint, Vector3 targetPos, ref Vector3[] waypoints)
 	{
 		Stack<Node> depthStack = new Stack<Node>();
 		HashSet<Node> visitedNodes = new HashSet<Node>();
-		Vector3[] waypoints = new Vector3[0];
+		bool pathFound = false;
 
 		Node startNode = grid.NodeFromWorldPoint(startPoint);
 		Node targetNode = grid.NodeFromWorldPoint(targetPos);
 
-		Node currentNode;
-
 		visitedNodes.Add(startNode);
 		depthStack.Push(startNode);
 
-		if(DepthFirst(depthStack, visitedNodes, targetNode))
+		pathFound = DepthFirst(depthStack, depthStack.Pop(), visitedNodes, targetNode);
+
+		//yield return null;
+
+		if(pathFound)
 		{
-			List<Node> pathNodes = depthStack.ToArray();
-
-			while(depthStack.Count > 0)
-			{
-				pathNodes.Add(depthStack.Pop());
-			}
-
-			requestManager.FinishedProcessingPath(waypoints, true);
+			waypoints = RetracePath(grid.NodeFromWorldPoint(startPoint), grid.NodeFromWorldPoint(targetPos));
 		}
-		else
-			requestManager.FinishedProcessingPath(waypoints, false);
+
+		return pathFound;
 	}
 
-	bool DepthFirst(Stack<Node> depthStack, HashSet<Node> visitedNodes, Node target)
+	bool DepthFirst(Stack<Node> depthStack, Node root, HashSet<Node> visitedNodes, Node target)
 	{
-		List<Node> sortList = new List<Node>();
 		bool targetFound = false;
 
-		foreach(Node node in grid.GetNeighbors(depthStack.Peek()))
+		foreach(Node node in grid.GetNeighbors(root))
 		{
 			if(node.walkable && !visitedNodes.Contains(node))
 			{
+				node.parent = root;
 				visitedNodes.Add(node);
-				sortList.Add(node);
+				depthStack.Push(node);
+
+				if(node == target)
+				{
+					targetFound = true;
+					return targetFound;
+				}
 			}
 		}
 
-		sortList.Sort();
+		if(depthStack.Count > 0)
+			targetFound = DepthFirst(depthStack, depthStack.Pop(), visitedNodes, target);
 
-		while(sortList.Count > 0)
-		{
-			sortList[0].parent = depthStack.Peek();
-			depthStack.Push(sortList[0]);
-			sortList.Remove(0);
-
-			targetFound = DepthFirst(depthStack.Peek(), visitedNodes, target);
-
-			if(targetFound)
-				return true;
-		}
-
-		return false;
+		return targetFound;
 	}
 	#endregion
 
@@ -268,6 +259,7 @@ public class Pathfinding : MonoBehaviour
 	}
 	#endregion
 
+	/*
 	void OnDrawGizmos()
 	{
 		if(hashSet != null && heap != null)
@@ -279,4 +271,5 @@ public class Pathfinding : MonoBehaviour
 			}
 		}
 	}
+	*/
 }
