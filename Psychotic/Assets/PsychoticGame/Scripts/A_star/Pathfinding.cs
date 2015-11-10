@@ -60,9 +60,10 @@ public class Pathfinding : MonoBehaviour
 			break;
 		}
 
+		requestManager.FinishedProcessingPath(waypoints, pathFound);
+
 		yield return null;
 
-		requestManager.FinishedProcessingPath(waypoints, pathFound);
 
 	}
 	#endregion
@@ -78,8 +79,8 @@ public class Pathfinding : MonoBehaviour
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint (targetPos);
 		
-		if(targetNode.walkable)
-		{
+		//if(targetNode.walkable)
+		//{
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node>();
 			
@@ -119,7 +120,7 @@ public class Pathfinding : MonoBehaviour
 					}
 				}
 			}
-		}
+		//}
 		//yield return null;
 		
 		if(pathSuccess)

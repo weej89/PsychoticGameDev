@@ -72,7 +72,7 @@ public class Grid : MonoBehaviour {
 
 		for(int x=0; x<gridSizeX; x++)
 		{
-			//Node node;
+			Node node;
 
 			for(int y=0; y<gridSizeY; y++)
 			{
