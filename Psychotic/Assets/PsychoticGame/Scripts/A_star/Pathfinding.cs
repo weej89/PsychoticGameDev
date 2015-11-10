@@ -11,6 +11,9 @@ public class Pathfinding : MonoBehaviour
 	#region Private Variables
 	PathRequestManager requestManager;
 	Grid grid;
+
+	List<Node> checkedNodes = new List<Node>();
+	List<Node> usedNodes = new List<Node>();
 	#endregion
 
 	#region Awake
@@ -63,12 +66,61 @@ public class Pathfinding : MonoBehaviour
 		requestManager.FinishedProcessingPath(waypoints, pathFound);
 
 		yield return null;
-
-
 	}
 	#endregion
 
 	#region A* Pathfinding
+	bool AStarPathfinding(Vector3 startPos, Vector3 targetPos, ref Vector3[] waypoints)
+	{
+		Stopwatch sw = new Stopwatch();
+		sw.Start();
+		
+		bool pathSuccess = false;
+		
+		Node startNode = grid.NodeFromWorldPoint(startPos);
+		Node targetNode = grid.NodeFromWorldPoint(targetPos);
+		
+		if (startNode.walkable && targetNode.walkable) {
+			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
+			HashSet<Node> closedSet = new HashSet<Node>();
+			openSet.Add(startNode);
+			
+			while (openSet.Count > 0) {
+				Node currentNode = openSet.RemoveFirst();
+				closedSet.Add(currentNode);
+				
+				if (currentNode == targetNode) {
+					sw.Stop();
+					print ("Path found: " + sw.ElapsedMilliseconds + " ms");
+					pathSuccess = true;
+					break;
+				}
+				
+				foreach (Node neighbour in grid.GetNeighbors(currentNode)) {
+					if (!neighbour.walkable || closedSet.Contains(neighbour)) {
+						continue;
+					}
+					
+					int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
+					if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) {
+						neighbour.gCost = newMovementCostToNeighbour;
+						neighbour.hCost = GetDistance(neighbour, targetNode);
+						neighbour.parent = currentNode;
+						
+						if (!openSet.Contains(neighbour))
+							openSet.Add(neighbour);
+					}
+				}
+			}
+		}
+
+		if (pathSuccess) {
+			waypoints = RetracePath(startNode,targetNode);
+		}
+
+		return pathSuccess;
+	}
+	/*
 	bool AStarPathfinding(Vector3 startPos, Vector3 targetPos, ref Vector3[] waypoints)
 	{
 		Stopwatch sw = new Stopwatch();
@@ -90,6 +142,7 @@ public class Pathfinding : MonoBehaviour
 			{
 				Node currentNode=openSet.RemoveFirst();
 				closedSet.Add(currentNode);
+				usedNodes.Add(currentNode);
 				
 				if(currentNode==targetNode)
 				{
@@ -114,7 +167,10 @@ public class Pathfinding : MonoBehaviour
 						neighbor.parent = currentNode;
 						
 						if(!openSet.Contains(neighbor))
+						{
 							openSet.Add(neighbor);
+							checkedNodes.Add(neighbor);
+						}
 						else
 							openSet.UpdateItem(neighbor);
 					}
@@ -128,8 +184,13 @@ public class Pathfinding : MonoBehaviour
 			waypoints = RetracePath(startNode, targetNode);
 		}
 
+		usedNodes.Clear();
+		checkedNodes.Clear();
+
 		return pathSuccess;
 	}
+	*/
+
 	#endregion
 
 	#region NewPathfinding
@@ -260,17 +321,22 @@ public class Pathfinding : MonoBehaviour
 	}
 	#endregion
 
-	/*
+
 	void OnDrawGizmos()
 	{
-		if(hashSet != null && heap != null)
+		if(usedNodes != null && checkedNodes != null)
 		{
-			foreach(Node node in hashSet)
+			foreach(Node node in usedNodes)
 			{
 				Gizmos.color = Color.yellow;
 				Gizmos.DrawCube(node.worldPosition, Vector3.one);
 			}
+			foreach(Node node in checkedNodes)
+			{
+				Gizmos.color = Color.green;
+				Gizmos.DrawCube(node.worldPosition, Vector3.one);
+			}
 		}
 	}
-	*/
+
 }

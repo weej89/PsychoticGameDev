@@ -75,20 +75,9 @@ public class PatrolState : IEnemyState
 		//Add decision tree stuff here for determining behaviors
 		if(zombie.TargetReached && currentTime < patrolTime && PathRequestManager.IsProcessingPath == false)
 		{
-				Vector3 target = targetArea.GenerateCheckingPath();
-				
-			/*
-				PathRequestManager.RequestPath(enemy.transform.position, target, (Vector3[] path, bool success) => {
-					if(success == true)
-					{
-						Debug.Log("Path found!");
-						zombie.OnPathFound(path, true);
-					}
-					else
-						Debug.Log("Path Not Found!");
-				});
-			*/
-			PathRequestManager.RequestPath(zombie.transform.position, target, zombie.OnPathFound, "DepthFirst");
+			Vector3 target = targetArea.GenerateCheckingPath();
+					
+			zombie.CallForNewPath(target, "DepthFirst");
 		}
 		else if (currentTime > patrolTime)
 		{
