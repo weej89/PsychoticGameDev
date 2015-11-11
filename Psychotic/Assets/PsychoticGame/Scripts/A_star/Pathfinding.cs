@@ -105,15 +105,22 @@ public class Pathfinding : MonoBehaviour
 
 					if(lineOfSight == true)
 					{
-						///
+						if (currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour) < neighbour.gCost)
+						{
+							neighbour.parent = currentNode.parent;
+							neighbour.gCost = currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour);
+						}
 					}
-					if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) {
-						neighbour.gCost = newMovementCostToNeighbour;
-						neighbour.hCost = GetDistance(neighbour, targetNode);
-						neighbour.parent = currentNode;
-						
-						if (!openSet.Contains(neighbour))
-							openSet.Add(neighbour);
+					else
+					{
+						if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) {
+							neighbour.gCost = newMovementCostToNeighbour;
+							neighbour.hCost = GetDistance(neighbour, targetNode);
+							neighbour.parent = currentNode;
+							
+							if (!openSet.Contains(neighbour))
+								openSet.Add(neighbour);
+						}
 					}
 				}
 			}
