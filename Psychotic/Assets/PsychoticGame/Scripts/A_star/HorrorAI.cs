@@ -14,6 +14,7 @@ public class HorrorAI : MonoBehaviour
 	#endregion
 
 	#region Public Variables
+	public BoxCollider sightBox;
 	public Transform target;
 	public float speed = 2;
 	public double newPathAvgTime;
