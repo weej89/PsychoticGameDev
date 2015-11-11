@@ -35,9 +35,9 @@ public class Pathfinding : MonoBehaviour
 	/// </summary>
 	/// <param name="startPos">Start position.</param>
 	/// <param name="targetPos">Target position.</param>
-	public void StartFindPath(Vector3 startPos, Vector3 targetPos, string pathType)
+	public void StartFindPath(Vector3 startPos, Vector3 targetPos, string pathType, bool lineOfSight)
 	{
-		StartCoroutine(FindPath(startPos, targetPos, pathType));
+		StartCoroutine(FindPath(startPos, targetPos, pathType, lineOfSight));
 	}
 	#endregion
 
@@ -48,7 +48,7 @@ public class Pathfinding : MonoBehaviour
 	/// <returns>The path.</returns>
 	/// <param name="startPos">Start position.</param>
 	/// <param name="targetPos">Target position.</param>
-	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, string pathfindingType)
+	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, string pathfindingType, bool lineOfSight)
 	{
 		Vector3[] waypoints = new Vector3[0];
 		bool pathFound = false;
@@ -56,7 +56,7 @@ public class Pathfinding : MonoBehaviour
 		switch (pathfindingType)
 		{
 			case "A*":
-			pathFound = AStarPathfinding(startPos, targetPos, ref waypoints);
+			pathFound = AStarPathfinding(startPos, targetPos, ref waypoints, lineOfSight);
 			break;
 			case "DepthFirst":
 			pathFound = FindPathNew(startPos, targetPos, ref waypoints);
@@ -70,7 +70,7 @@ public class Pathfinding : MonoBehaviour
 	#endregion
 
 	#region A* Pathfinding
-	bool AStarPathfinding(Vector3 startPos, Vector3 targetPos, ref Vector3[] waypoints)
+	bool AStarPathfinding(Vector3 startPos, Vector3 targetPos, ref Vector3[] waypoints, bool lineOfSight)
 	{
 		Stopwatch sw = new Stopwatch();
 		sw.Start();
@@ -102,6 +102,11 @@ public class Pathfinding : MonoBehaviour
 					}
 					
 					int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
+
+					if(lineOfSight == true)
+					{
+						///
+					}
 					if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) {
 						neighbour.gCost = newMovementCostToNeighbour;
 						neighbour.hCost = GetDistance(neighbour, targetNode);

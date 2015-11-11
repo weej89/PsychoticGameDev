@@ -55,7 +55,7 @@ public class AlertState : IEnemyState
 			Debug.DrawLine(enemy.eyes.transform.position, new Vector3(enemy.eyes.transform.forward.x, enemy.eyes.transform.forward.y, enemy.eyes.transform.forward.z + enemy.sightRange));
 
 			enemy.chaseTarget = hit.transform;
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*");
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
 
 			ToChaseState();
 		}

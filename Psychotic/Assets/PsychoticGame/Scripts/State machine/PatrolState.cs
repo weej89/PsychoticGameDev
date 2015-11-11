@@ -63,7 +63,7 @@ public class PatrolState : IEnemyState
 		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{
 			enemy.chaseTarget = hit.transform;
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*");
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
 			ToChaseState();
 		}
 	}
@@ -77,7 +77,7 @@ public class PatrolState : IEnemyState
 		{
 			Vector3 target = targetArea.GenerateCheckingPath();
 					
-			zombie.CallForNewPath(target, "DepthFirst");
+			zombie.CallForNewPath(target, "DepthFirst", false);
 		}
 		else if (currentTime > patrolTime)
 		{

@@ -41,8 +41,8 @@ public class PathRequestManager : MonoBehaviour {
 	/// <param name="pathStart">Path start.</param>
 	/// <param name="pathEnd">Path end.</param>
 	/// <param name="callback">Callback.</param>
-	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback, string pathType) {
-		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback, pathType);
+	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback, string pathType, bool lineOfSight) {
+		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback, pathType, lineOfSight);
 		instance.pathRequestQueue.Enqueue(newRequest);
 		instance.TryProcessNext();
 	}
@@ -57,7 +57,7 @@ public class PathRequestManager : MonoBehaviour {
 		if (!isProcessingPath && pathRequestQueue.Count > 0) {
 			currentPathRequest = pathRequestQueue.Dequeue();
 			isProcessingPath = true;
-			pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.pathfindingType);
+			pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.pathfindingType, currentPathRequest.lineOfSight);
 		}
 	}
 	#endregion
@@ -77,16 +77,18 @@ public class PathRequestManager : MonoBehaviour {
 
 	#region PathRequest (DataStructure)
 	struct PathRequest {
+		public bool lineOfSight;
 		public Vector3 pathStart;
 		public Vector3 pathEnd;
 		public Action<Vector3[], bool> callback;
 		public string pathfindingType;
 		
-		public PathRequest(Vector3 _start, Vector3 _end, Action<Vector3[], bool> _callback, string _pathfindingType) {
+		public PathRequest(Vector3 _start, Vector3 _end, Action<Vector3[], bool> _callback, string _pathfindingType, bool _lineOfSight) {
 			pathStart = _start;
 			pathEnd = _end;
 			callback = _callback;
 			pathfindingType = _pathfindingType;
+			lineOfSight = _lineOfSight;
 		}
 	}
 	#endregion
