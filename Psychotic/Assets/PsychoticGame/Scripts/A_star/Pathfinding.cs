@@ -52,7 +52,7 @@ public class Pathfinding : MonoBehaviour
 	{
 		Vector3[] waypoints = new Vector3[0];
 		bool pathFound = false;
-
+		/*
 		switch (pathfindingType)
 		{
 			case "A*":
@@ -62,25 +62,26 @@ public class Pathfinding : MonoBehaviour
 			pathFound = FindPathNew(startPos, targetPos, ref waypoints);
 			break;
 		}
-
-		requestManager.FinishedProcessingPath(waypoints, pathFound);
+		*/
 
 		yield return null;
 	}
 	#endregion
 
 	#region A* Pathfinding
-	bool AStarPathfinding(Vector3 startPos, Vector3 targetPos, ref Vector3[] waypoints, bool lineOfSight)
+	public IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos, bool lineOfSight)
 	{
 		Stopwatch sw = new Stopwatch();
 		sw.Start();
+
+		Vector3[] waypoints = new Vector3[0];
 		
 		bool pathSuccess = false;
 		
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint(targetPos);
 		
-		if (startNode.walkable && targetNode.walkable) {
+		//if (startNode.walkable && targetNode.walkable) {
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node>();
 			openSet.Add(startNode);
@@ -105,10 +106,18 @@ public class Pathfinding : MonoBehaviour
 
 					if(lineOfSight == true)
 					{
-						if (currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour) < neighbour.gCost)
+						if (currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour) < neighbour.gCost && !openSet.Contains(neighbour))
 						{
 							neighbour.parent = currentNode.parent;
 							neighbour.gCost = currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour);
+						}
+						else if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) {
+							neighbour.gCost = newMovementCostToNeighbour;
+							neighbour.hCost = GetDistance(neighbour, targetNode);
+							neighbour.parent = currentNode;
+							
+							if (!openSet.Contains(neighbour))
+								openSet.Add(neighbour);
 						}
 					}
 					else
@@ -124,90 +133,22 @@ public class Pathfinding : MonoBehaviour
 					}
 				}
 			}
-		}
+		//}
+
+		yield return null;
 
 		if (pathSuccess) {
 			waypoints = RetracePath(startNode,targetNode);
 		}
 
-		return pathSuccess;
+		requestManager.FinishedProcessingPath(waypoints, pathSuccess);
 	}
-	/*
-	bool AStarPathfinding(Vector3 startPos, Vector3 targetPos, ref Vector3[] waypoints)
-	{
-		Stopwatch sw = new Stopwatch();
-		sw.Start();
-		
-		bool pathSuccess = false;
-		
-		Node startNode = grid.NodeFromWorldPoint(startPos);
-		Node targetNode = grid.NodeFromWorldPoint (targetPos);
-		
-		//if(targetNode.walkable)
-		//{
-			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
-			HashSet<Node> closedSet = new HashSet<Node>();
-			
-			openSet.Add(startNode);
-			
-			while (openSet.Count>0)
-			{
-				Node currentNode=openSet.RemoveFirst();
-				closedSet.Add(currentNode);
-				usedNodes.Add(currentNode);
-				
-				if(currentNode==targetNode)
-				{
-					sw.Stop();
-					pathSuccess = true;
-					//print("Path found: " +sw.ElapsedMilliseconds+ " ms");
-					break;
-				}
-				
-				foreach(Node neighbor in grid.GetNeighbors(currentNode))
-				{
-					if(!neighbor.walkable || closedSet.Contains(neighbor))
-					{
-						continue;
-					}
-					
-					int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
-					if(newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
-					{
-						neighbor.gCost = newMovementCostToNeighbor;
-						neighbor.hCost = GetDistance(neighbor, targetNode);
-						neighbor.parent = currentNode;
-						
-						if(!openSet.Contains(neighbor))
-						{
-							openSet.Add(neighbor);
-							checkedNodes.Add(neighbor);
-						}
-						else
-							openSet.UpdateItem(neighbor);
-					}
-				}
-			}
-		//}
-		//yield return null;
-		
-		if(pathSuccess)
-		{
-			waypoints = RetracePath(startNode, targetNode);
-		}
-
-		usedNodes.Clear();
-		checkedNodes.Clear();
-
-		return pathSuccess;
-	}
-	*/
-
 	#endregion
 
 	#region NewPathfinding
-	bool FindPathNew(Vector3 startPoint, Vector3 targetPos, ref Vector3[] waypoints)
+	public IEnumerator DepthFirstSearch(Vector3 startPoint, Vector3 targetPos)
 	{
+		Vector3[] waypoints = new Vector3[0];
 		Stack<Node> depthStack = new Stack<Node>();
 		HashSet<Node> visitedNodes = new HashSet<Node>();
 		bool pathFound = false;
@@ -227,7 +168,9 @@ public class Pathfinding : MonoBehaviour
 			waypoints = RetracePath(grid.NodeFromWorldPoint(startPoint), grid.NodeFromWorldPoint(targetPos));
 		}
 
-		return pathFound;
+		yield return null;
+
+		requestManager.FinishedProcessingPath(waypoints, pathFound);
 	}
 
 	bool DepthFirst(Stack<Node> depthStack, Node root, HashSet<Node> visitedNodes, Node target)

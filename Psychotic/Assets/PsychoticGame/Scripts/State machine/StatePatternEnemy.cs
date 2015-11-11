@@ -14,6 +14,8 @@ public class StatePatternEnemy : MonoBehaviour
 	public TargetArea targetArea;
 	public float targetAreaRadius = 50f;
 	public Transform seeker;
+
+	public GameObject pathFinding;
 	
 	[HideInInspector] public Transform chaseTarget;
 	[HideInInspector] public IEnemyState currentState;
@@ -22,14 +24,18 @@ public class StatePatternEnemy : MonoBehaviour
 	[HideInInspector] public PatrolState patrolState;
 	[HideInInspector] public Animator anim;
 
+	/*
 	private HorrorAI enemy;
 	private Grid grid;
+	*/
 
+	public HorrorAI enemy;
+	public Grid grid;
 	private void Awake()
 	{
-		GameObject pathFinding = GameObject.Find("A*");
-		enemy = GetComponent<HorrorAI>();
-		grid = pathFinding.GetComponent<Grid>();
+		//GameObject pathFinding = GameObject.Find("A*");
+		//enemy = GetComponent<HorrorAI>();
+		//grid = pathFinding.GetComponent<Grid>();
 
 		chaseState = new ChaseState(this, enemy);
 		alertState = new AlertState(this, enemy);

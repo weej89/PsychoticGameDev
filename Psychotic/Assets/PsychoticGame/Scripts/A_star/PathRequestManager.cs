@@ -57,7 +57,17 @@ public class PathRequestManager : MonoBehaviour {
 		if (!isProcessingPath && pathRequestQueue.Count > 0) {
 			currentPathRequest = pathRequestQueue.Dequeue();
 			isProcessingPath = true;
-			pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.pathfindingType, currentPathRequest.lineOfSight);
+
+			switch(currentPathRequest.pathfindingType)
+			{
+				case "A*":
+				StartCoroutine(pathfinding.AStarPathfinding(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.lineOfSight));
+				break;
+				case "DepthFirst":
+				StartCoroutine(pathfinding.DepthFirstSearch(currentPathRequest.pathStart, currentPathRequest.pathEnd));
+				break;
+			}
+			//pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.pathfindingType, currentPathRequest.lineOfSight);
 		}
 	}
 	#endregion

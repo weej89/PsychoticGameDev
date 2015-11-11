@@ -167,7 +167,7 @@ public class HorrorAI : MonoBehaviour
 
 	public void PerformRotation(Transform trans, Vector3 currentWaypoint)
 	{
-
+		Debug.Log("Performing Rotation");
 		direction = (currentWaypoint - trans.position).normalized;
 		lookRotation = Quaternion.LookRotation (direction);
 		trans.rotation = Quaternion.Slerp (trans.rotation, lookRotation, Time.deltaTime * rotationSpeed);

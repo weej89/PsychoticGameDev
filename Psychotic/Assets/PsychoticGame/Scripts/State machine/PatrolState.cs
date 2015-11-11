@@ -77,7 +77,7 @@ public class PatrolState : IEnemyState
 		{
 			Vector3 target = targetArea.GenerateCheckingPath();
 					
-			zombie.CallForNewPath(target, "DepthFirst", false);
+			zombie.CallForNewPath(target, "A*", false);
 		}
 		else if (currentTime > patrolTime)
 		{
