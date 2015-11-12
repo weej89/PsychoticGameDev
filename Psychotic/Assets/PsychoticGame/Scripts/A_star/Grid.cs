@@ -182,8 +182,13 @@ public class Grid : MonoBehaviour {
 			{
 				foreach(Node n in grid)
 				{
-					Gizmos.color=(n.walkable)?Color.white:Color.red;
-					Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
+					//Gizmos.color=(n.walkable)?Color.white:Color.red;
+					//Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
+					if(!n.walkable)
+					{
+						Gizmos.color = Color.red;
+						Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
+					}
 				}
 			}
 		}

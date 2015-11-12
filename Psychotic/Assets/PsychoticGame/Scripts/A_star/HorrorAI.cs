@@ -86,7 +86,7 @@ public class HorrorAI : MonoBehaviour
 	/// <param name="pathSuccessful">If set to <c>true</c> path successful.</param>
 	public void OnPathFound (Vector3[] newPath, bool pathSuccessful)
 	{
-		if (pathSuccessful) 
+		if (pathSuccessful && newPath.Length > 1) 
 		{
 			path = newPath;
 			targetReached = false;

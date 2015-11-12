@@ -106,7 +106,7 @@ public class Pathfinding : MonoBehaviour
 
 					if(lineOfSight == true)
 					{
-						if (currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour) < neighbour.gCost && !openSet.Contains(neighbour))
+						if (currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour) < neighbour.gCost && !openSet.Contains(neighbour) && currentNode != startNode)
 						{
 							neighbour.parent = currentNode.parent;
 							neighbour.gCost = currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour);
