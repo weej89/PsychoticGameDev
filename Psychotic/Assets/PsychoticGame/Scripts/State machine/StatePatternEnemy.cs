@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class StatePatternEnemy : MonoBehaviour
@@ -16,13 +16,16 @@ public class StatePatternEnemy : MonoBehaviour
 	public Transform seeker;
 
 	public GameObject pathFinding;
-	
+
+
 	[HideInInspector] public Transform chaseTarget;
 	[HideInInspector] public IEnemyState currentState;
 	[HideInInspector] public ChaseState chaseState;
 	[HideInInspector] public AlertState alertState;
 	[HideInInspector] public PatrolState patrolState;
 	[HideInInspector] public Animator anim;
+	[HideInInspector] public EnemySight enemySight;
+
 
 	/*
 	private HorrorAI enemy;
@@ -36,7 +39,7 @@ public class StatePatternEnemy : MonoBehaviour
 		//GameObject pathFinding = GameObject.Find("A*");
 		//enemy = GetComponent<HorrorAI>();
 		//grid = pathFinding.GetComponent<Grid>();
-
+		enemySight = GetComponent<EnemySight> ();
 		chaseState = new ChaseState(this, enemy);
 		alertState = new AlertState(this, enemy);
 		patrolState = new PatrolState(this, enemy, grid);
