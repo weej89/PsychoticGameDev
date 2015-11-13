@@ -28,7 +28,7 @@ public class AlertState : IEnemyState
 	
 	public void ToPatrolState()
 	{
-		enemy.patrolState.GetNextRandomInterval(enemy.avgPatrolInterval);
+		enemy.patrolState.GetPatrolPoint(enemy.patrolState.GetNextRandomInterval(enemy.avgPatrolInterval));
 		enemy.currentState = enemy.patrolState;
 		searchTimer = 0f;
 		zombie.speed = zombie.DEFAULT_WALKING_SPEED;
@@ -48,6 +48,7 @@ public class AlertState : IEnemyState
 
 	private void Look()
 	{
+		/*
 		RaycastHit hit;
 		
 		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
@@ -57,6 +58,13 @@ public class AlertState : IEnemyState
 			enemy.chaseTarget = hit.transform;
 			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
 
+			ToChaseState();
+		}
+		*/
+		if(enemy.enemySight.playerInSight)
+		{
+			enemy.chaseTarget = enemy.enemySight.targetLocation;
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
 			ToChaseState();
 		}
 	}

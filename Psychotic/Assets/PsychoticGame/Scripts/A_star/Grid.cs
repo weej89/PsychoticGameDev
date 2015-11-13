@@ -45,7 +45,7 @@ public class Grid : MonoBehaviour {
 
 		foreach(Node node in grid)
 		{
-			DetermineMovementPenalty(node);
+			DetermineMovementPenalty(node, 5);
 		}
 	}
 	#endregion
@@ -122,7 +122,7 @@ public class Grid : MonoBehaviour {
 				if(checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
 				{
 					neighbors.Add(grid[checkX, checkY]);
-					//DetermineMovementPenalty(grid[checkX, checkY]);
+					//DetermineMovementPenalty(grid[checkX, checkY], 5);
 				}
 			}
 		}
@@ -131,17 +131,21 @@ public class Grid : MonoBehaviour {
 	}
 	#endregion
 
-	public void DetermineMovementPenalty(Node node)
+	public void DetermineMovementPenalty(Node node, int penalty)
 	{
 		int movementPenalty = 0;
 
-		foreach(Node n in GetNeighbors(node))
+		if(penalty > 0)
 		{
-			if(!n.walkable)
-				movementPenalty += 15;
-		}
-		
-		node.movementPenalty += movementPenalty;
+			foreach(Node n in GetNeighbors(node))
+			{
+				if(!n.walkable || node.movementPenalty > 0)
+				{
+					node.movementPenalty += penalty;
+					DetermineMovementPenalty(n, penalty-1);
+				}
+			}
+		}		
 	}
 
 	#region NodeFromWorldPoint
@@ -187,6 +191,11 @@ public class Grid : MonoBehaviour {
 					if(!n.walkable)
 					{
 						Gizmos.color = Color.red;
+						Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
+					}
+					if(n.movementPenalty > 0)
+					{
+						Gizmos.color = Color.yellow;
 						Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
 					}
 				}

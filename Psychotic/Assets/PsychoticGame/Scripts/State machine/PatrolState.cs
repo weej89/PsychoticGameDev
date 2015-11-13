@@ -28,8 +28,8 @@ public class PatrolState : IEnemyState
 	
 	public void OnTriggerEnter(Collider other)
 	{
-		if(other.gameObject.CompareTag("Player"))
-			ToAlertState();
+		//if(other.gameObject.CompareTag("Player"))
+			//ToAlertState();
 	}
 	
 	public void ToPatrolState()
@@ -58,11 +58,20 @@ public class PatrolState : IEnemyState
 
 	private void Look()
 	{
+		/*
 		RaycastHit hit;
-		
+
 		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
 		{
 			enemy.chaseTarget = hit.transform;
+			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
+			ToChaseState();
+		}
+		*/
+
+		if(enemy.enemySight.playerInSight)
+		{
+			enemy.chaseTarget = enemy.enemySight.targetLocation;
 			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
 			ToChaseState();
 		}
