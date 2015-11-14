@@ -204,6 +204,16 @@ public class Grid : MonoBehaviour {
 	}
 	#endregion
 
+	#region ResetNodes
+	public void ResetNodes()
+	{
+		foreach(Node n in grid)
+		{
+			n.parent = null;
+		}
+	}
+	#endregion
+
 	[System.Serializable]
 	public class TerrainType
 	{

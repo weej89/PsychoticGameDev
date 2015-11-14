@@ -66,6 +66,9 @@ public class PathRequestManager : MonoBehaviour {
 				case "DepthFirst":
 				StartCoroutine(pathfinding.DepthFirstSearch(currentPathRequest.pathStart, currentPathRequest.pathEnd));
 				break;
+				case "IterativeDeepening":
+				StartCoroutine(pathfinding.IterativeDeepening(currentPathRequest.pathStart, currentPathRequest.pathEnd));
+				break;
 			}
 			//pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.pathfindingType, currentPathRequest.lineOfSight);
 		}

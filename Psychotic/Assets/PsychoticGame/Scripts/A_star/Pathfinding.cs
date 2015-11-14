@@ -28,6 +28,7 @@ public class Pathfinding : MonoBehaviour
 	}
 	#endregion
 
+	/*
 	#region StartFindPath
 	/// <summary>
 	/// Starts a new Coroutine to Find a path with given
@@ -40,34 +41,7 @@ public class Pathfinding : MonoBehaviour
 		StartCoroutine(FindPath(startPos, targetPos, pathType, lineOfSight));
 	}
 	#endregion
-
-	#region FindPath
-	/// <summary>
-	/// Enumerator used as Coroutine to find a path to target node
-	/// </summary>
-	/// <returns>The path.</returns>
-	/// <param name="startPos">Start position.</param>
-	/// <param name="targetPos">Target position.</param>
-	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, string pathfindingType, bool lineOfSight)
-	{
-		Vector3[] waypoints = new Vector3[0];
-		bool pathFound = false;
-		/*
-		switch (pathfindingType)
-		{
-			case "A*":
-			pathFound = AStarPathfinding(startPos, targetPos, ref waypoints, lineOfSight);
-			break;
-			case "DepthFirst":
-			pathFound = FindPathNew(startPos, targetPos, ref waypoints);
-			break;
-		}
-		*/
-
-		yield return null;
-	}
-	#endregion
-
+*/
 	#region A* Pathfinding
 	public IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos, bool lineOfSight)
 	{
@@ -145,6 +119,115 @@ public class Pathfinding : MonoBehaviour
 	}
 	#endregion
 
+	#region FringeSearch
+	public IEnumerator FringeSearch(Vector3 startPoint, Vector3 targetPos)
+	{
+		List<Node> fringe = new List<Node>();
+		HashSet<Node> cache = new HashSet<Node>();
+		bool found = false;
+		int flimit;
+
+		Node startNode = grid.NodeFromWorldPoint(startPoint);
+		Node targetNode = grid.NodeFromWorldPoint(targetPos);
+
+		cache.Add(startNode);
+		fringe.Add(startNode);
+		flimit = startNode.hCost;
+
+		while(!found && fringe.Count > 0)
+		{
+			int fmin = int.MaxValue;
+
+			for(int i = 0; i < fringe.Count; i++)
+			{
+				Node n = fringe[i];
+				n.hCost = GetDistance(n, targetNode);
+				n.parent = fringe[i];
+				cache.Add(n);
+			}
+		}
+		
+		yield return null;
+
+		if(found)
+			RetracePath(startNode, targetNode);
+
+	}
+	#endregion
+
+	#region IterativeDeepeningSearch
+	public IEnumerator IterativeDeepening(Vector3 startPoint, Vector3 targetPos)
+	{
+		grid.ResetNodes();
+
+		HashSet<Node> visitedHash = new HashSet<Node>();
+		Node startNode = grid.NodeFromWorldPoint(startPoint);
+		Node targetNode = grid.NodeFromWorldPoint(targetPos);
+		visitedHash.Add(startNode);
+
+		Vector3[] waypoints = new Vector3[0];
+		
+		int depth = 0;
+		bool targetFound = false;
+
+		Stopwatch sw = new Stopwatch();
+		sw.Start();
+
+		while(!targetFound && visitedHash.Count < grid.MaxSize)
+		{
+			targetFound = Deepening(startNode, depth, visitedHash, targetNode);
+
+			visitedHash.RemoveWhere(n => n.parent != null && n != startNode);
+
+			depth++;
+		}
+
+		sw.Stop();
+		print ("Path found: " + sw.ElapsedMilliseconds + " ms");
+
+		yield return null;
+
+		if(targetFound)
+			waypoints = RetracePath(startNode, targetNode);
+
+		requestManager.FinishedProcessingPath(waypoints, targetFound);
+	}
+
+	bool Deepening(Node root, int depth, HashSet<Node> visitedHash, Node target)
+	{
+		bool targetFound = false;
+		Heap<Node> nodeHeap = new Heap<Node>(8);
+
+		if(depth >= 0)
+		{
+			if(root == target)
+			{
+				return true;
+			}
+			else
+			{
+				foreach(Node n in grid.GetNeighbors(root))
+				{
+					if(!visitedHash.Contains(n) && n.walkable)
+					{
+						n.hCost = GetDistance(n, target);
+						nodeHeap.Add(n);
+						visitedHash.Add(n);
+					}
+				}
+
+				while(nodeHeap.Count > 0 && targetFound == false)
+				{
+					Node node = nodeHeap.RemoveFirst();
+					node.parent = root;
+					targetFound = Deepening(node, depth-1, visitedHash, target);
+				}
+			}
+		}
+		return targetFound;
+	}
+	#endregion
+
 	#region NewPathfinding
 	public IEnumerator DepthFirstSearch(Vector3 startPoint, Vector3 targetPos)
 	{
@@ -160,8 +243,6 @@ public class Pathfinding : MonoBehaviour
 		depthStack.Push(startNode);
 
 		pathFound = DepthFirst(depthStack, depthStack.Pop(), visitedNodes, targetNode);
-
-		//yield return null;
 
 		if(pathFound)
 		{
