@@ -81,9 +81,11 @@ public class DoubleDecision : Decision
 		case TestCondition.LESS_THAN:
 			if(result < testValue)
 				return true;
+			break;
 		case TestCondition.NOT_EQUAL:
 			if(result != testValue)
 				return true;
+			break;
 		}
 		
 		return false;

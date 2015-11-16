@@ -22,4 +22,8 @@ public class VectorDecision : Decision
 		this.operation = operation;
 	}
 
+	public override DecisionTreeNode GetBranch ()
+	{
+		throw new System.NotImplementedException ();
+	}
 }
