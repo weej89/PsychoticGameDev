@@ -6,6 +6,7 @@ public class DoubleDecision : Decision
 	private double testValue;
 	private double arg1, arg2;
 
+
 	public DoubleDecision(DecisionTreeNode _trueNode, DecisionTreeNode _falseNode, TestCondition _testCondition, double arg1, double testValue)
 		:base(_trueNode, _falseNode, _testCondition)
 	{

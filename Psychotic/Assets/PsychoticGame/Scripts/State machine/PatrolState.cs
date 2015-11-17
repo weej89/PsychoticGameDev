@@ -10,6 +10,8 @@ public class PatrolState : IEnemyState
 	private double currentTime = 0;
 	private Grid grid;
 
+	private Decision[] decisions = new Decision[4];
+
 	public TargetArea targetArea;
 
 	public PatrolState(StatePatternEnemy statePatternEnemy, HorrorAI zombie, Grid grid)
@@ -17,6 +19,21 @@ public class PatrolState : IEnemyState
 		this.enemy = statePatternEnemy;
 		this.zombie = zombie;
 		this.grid = grid;
+	}
+
+	private void ConstructTrees()
+	{
+
+	}
+
+	private void ConstructOnStateEnter()
+	{
+		decisions[0] = (new Decision(decisions[1], decisions[2], (object[]args) => {
+			 if((float)args[0] == (float)args[1])
+				return true;
+			else
+				return false;
+		}) {args = {}});
 	}
 
 	public void UpdateState()

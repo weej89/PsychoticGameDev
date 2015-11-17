@@ -27,21 +27,7 @@ public class Pathfinding : MonoBehaviour
 		grid=GetComponent<Grid>();
 	}
 	#endregion
-
-	/*
-	#region StartFindPath
-	/// <summary>
-	/// Starts a new Coroutine to Find a path with given
-	/// start and end point
-	/// </summary>
-	/// <param name="startPos">Start position.</param>
-	/// <param name="targetPos">Target position.</param>
-	public void StartFindPath(Vector3 startPos, Vector3 targetPos, string pathType, bool lineOfSight)
-	{
-		StartCoroutine(FindPath(startPos, targetPos, pathType, lineOfSight));
-	}
-	#endregion
-*/
+		
 	#region A* Pathfinding
 	public IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos, bool lineOfSight)
 	{
@@ -55,7 +41,7 @@ public class Pathfinding : MonoBehaviour
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint(targetPos);
 		
-		//if (startNode.walkable && targetNode.walkable) {
+		if (startNode.walkable && targetNode.walkable) {
 			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node>();
 			openSet.Add(startNode);
@@ -107,7 +93,7 @@ public class Pathfinding : MonoBehaviour
 					}
 				}
 			}
-		//}
+		}
 
 		yield return null;
 
