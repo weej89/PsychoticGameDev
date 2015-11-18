@@ -72,8 +72,6 @@ public class Grid : MonoBehaviour {
 
 		for(int x=0; x<gridSizeX; x++)
 		{
-			Node node;
-
 			for(int y=0; y<gridSizeY; y++)
 			{
 				Vector3 worldPoint=worldBottmLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
@@ -133,8 +131,6 @@ public class Grid : MonoBehaviour {
 
 	public void DetermineMovementPenalty(Node node, int penalty)
 	{
-		int movementPenalty = 0;
-
 		if(penalty > 0)
 		{
 			foreach(Node n in GetNeighbors(node))

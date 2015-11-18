@@ -26,6 +26,8 @@ public class StatePatternEnemy : MonoBehaviour
 	[HideInInspector] public Animator anim;
 	[HideInInspector] public EnemySight enemySight;
 
+	[HideInInspector] public string pathfindingStrategy;
+
 
 	/*
 	private HorrorAI enemy;
@@ -57,7 +59,6 @@ public class StatePatternEnemy : MonoBehaviour
 	void Update () 
 	{
 		currentState.UpdateState();
-		//Debug.DrawRay(eyes.transform.position, eyes.transform.forward, Color.white, 1.0f);
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -65,6 +66,32 @@ public class StatePatternEnemy : MonoBehaviour
 		currentState.OnTriggerEnter(other);
 	}
 
+	public void PerformAction(TreeAction action)
+	{
+		pathfindingStrategy = action.pathFindingMethod;
+		enemy.target = action.targetPos;
+
+		if(currentState.GetString() != action.targetState)
+			PerformStateTransition(action.targetState);
+	}
+
+	private void PerformStateTransition(string state)
+	{
+		switch(state)
+		{
+		case "Patrol":
+			this.currentState = patrolState;
+			break;
+		case "Alert":
+			this.currentState = alertState;
+			break;
+		case "Chase":
+			this.currentState = chaseState;
+			break;
+		}
+
+		currentState.OnStateEnter();
+	}
 
 	public void OnDrawGizmos()
 	{

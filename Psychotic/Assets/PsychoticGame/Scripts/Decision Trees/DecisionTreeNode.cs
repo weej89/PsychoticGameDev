@@ -11,12 +11,13 @@ public abstract class DecisionTreeNode
 
 	}
 
-	public DecisionTreeNode (DecisionTreeNode _trueNode, DecisionTreeNode _falseNode)
+	public DecisionTreeNode (DecisionTreeNode _falseNode, DecisionTreeNode _trueNode)
 	{
 		this.trueNode = _trueNode;
-		this.falseNode = _falseNode;		}
+		this.falseNode = _falseNode;		
+	}
 		
 	public abstract DecisionTreeNode GetBranch();
 		
-	public abstract Action MakeDecision(DecisionTreeNode root);
+	public abstract TreeAction MakeDecision(DecisionTreeNode root);
 }

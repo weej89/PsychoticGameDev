@@ -10,10 +10,13 @@ public interface IEnemyState
 
 	void OnTriggerEnter(Collider other);
 
+	void OnStateEnter();
+
 	void ToPatrolState();
 	
 	void ToAlertState();
 
 	void ToChaseState();
 
+	string GetString();
 }

@@ -24,6 +24,11 @@ public class ChaseState : IEnemyState
 	{
 		
 	}
+
+	public void OnStateEnter()
+	{
+		
+	}
 	
 	public void ToPatrolState()
 	{
@@ -75,5 +80,10 @@ public class ChaseState : IEnemyState
 		if(zombie.TargetReached && PathRequestManager.IsProcessingPath == false)
 			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
 
+	}
+
+	public string GetString()
+	{
+		return "Chase";
 	}
 }

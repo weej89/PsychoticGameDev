@@ -10,7 +10,8 @@ public class PatrolState : IEnemyState
 	private double currentTime = 0;
 	private Grid grid;
 
-	private Decision[] decisions = new Decision[4];
+	private Decision[] decisions = new Decision[5];
+	private TreeAction[] actions = new TreeAction[6];
 
 	public TargetArea targetArea;
 
@@ -28,12 +29,93 @@ public class PatrolState : IEnemyState
 
 	private void ConstructOnStateEnter()
 	{
+		//Is the distance from enemy to player < 10 meters?
 		decisions[0] = (new Decision(decisions[1], decisions[2], (object[]args) => {
-			 if((float)args[0] == (float)args[1])
+			 if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 10)
 				return true;
 			else
 				return false;
 		}) {args = {}});
+
+		//Was the player last seen > 1 minute ago?
+		decisions[1] = (new Decision(actions[0], actions[1], (object[]args) => {
+			if(Time.time - enemy.enemySight.playerLastSeenTime > 1)
+				return true;
+			else
+				return false;
+		}) {args = {}});
+
+		//Is the player in the collider?
+		decisions[2] = (new Decision(actions[2], decisions[3], (object[]args) => {
+			if(enemy.enemySight.playerInCollider)
+				return true;
+			else
+				return false;
+		}) {args = {}});
+
+		//Is the Player visible?
+		decisions[3] = (new Decision(decisions[4], actions[3], (object[]args) => {
+			if(enemy.enemySight.playerInSight)
+				return true;
+			else
+				return false;
+		}) {args = {}});
+
+		//Is the player audible?
+		decisions[4] = (new Decision(actions[4], actions[5], (object[]args) => {
+			if(enemy.enemySight.PlayerAudible())
+				return true;
+			else
+				return false;
+		}) {args = {}});
+		
+		actions[0] = new TreeAction()
+		{
+			pathFindingMethod = "A*",
+			targetState = "Patrol",
+			animation = "None"
+		};
+
+		actions[1] = new TreeAction((object[] args) => {
+			try
+			{
+				GetPatrolPoint(enemy.avgPatrolInterval);
+				return 1;
+			}
+			catch(UnityException ex)
+			{
+				Debug.Log("Exception in Getting New Patrol Point Action" +ex);
+				return 0;
+			}
+		}){	args = {}, pathFindingMethod = "A*", targetState = "Patrol", animation = "None"};
+
+		actions[2] = new TreeAction()
+		{
+			pathFindingMethod = "IterativeDeepening",
+			targetState = "Patrol",
+			animation = "None"
+		};
+
+		actions[3] = new TreeAction()
+		{
+			pathFindingMethod = "A*",
+			targetState = "Chase",
+			animation = "None"
+		};
+
+		actions[4] = new TreeAction()
+		{
+			pathFindingMethod = "IterativeDeepening",
+			targetState = "Patrol",
+			animation = "None"
+		};
+
+		actions[5] = new TreeAction()
+		{
+			pathFindingMethod = "A*",
+			targetState = "Alert",
+			animation = "None"
+		};
 	}
 
 	public void UpdateState()
@@ -41,6 +123,11 @@ public class PatrolState : IEnemyState
 		Debug.Log("IN PATROL");
 		Look();
 		Patrol();
+	}
+
+	public void OnStateEnter()
+	{
+		
 	}
 	
 	public void OnTriggerEnter(Collider other)
@@ -127,4 +214,9 @@ public class PatrolState : IEnemyState
 		return interval;
 	}
 	#endregion
+
+	public string GetString()
+	{
+		return "Patrol";
+	}
 }

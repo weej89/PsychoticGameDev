@@ -104,43 +104,7 @@ public class Pathfinding : MonoBehaviour
 		requestManager.FinishedProcessingPath(waypoints, pathSuccess);
 	}
 	#endregion
-
-	#region FringeSearch
-	public IEnumerator FringeSearch(Vector3 startPoint, Vector3 targetPos)
-	{
-		List<Node> fringe = new List<Node>();
-		HashSet<Node> cache = new HashSet<Node>();
-		bool found = false;
-		int flimit;
-
-		Node startNode = grid.NodeFromWorldPoint(startPoint);
-		Node targetNode = grid.NodeFromWorldPoint(targetPos);
-
-		cache.Add(startNode);
-		fringe.Add(startNode);
-		flimit = startNode.hCost;
-
-		while(!found && fringe.Count > 0)
-		{
-			int fmin = int.MaxValue;
-
-			for(int i = 0; i < fringe.Count; i++)
-			{
-				Node n = fringe[i];
-				n.hCost = GetDistance(n, targetNode);
-				n.parent = fringe[i];
-				cache.Add(n);
-			}
-		}
-		
-		yield return null;
-
-		if(found)
-			RetracePath(startNode, targetNode);
-
-	}
-	#endregion
-
+	
 	#region IterativeDeepeningSearch
 	public IEnumerator IterativeDeepening(Vector3 startPoint, Vector3 targetPos)
 	{

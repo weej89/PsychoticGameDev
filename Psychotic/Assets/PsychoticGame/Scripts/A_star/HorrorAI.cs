@@ -9,8 +9,8 @@ public class HorrorAI : MonoBehaviour
 	#region Public Hidden Variables
 	[HideInInspector]
 	public float DEFAULT_WALKING_SPEED = 2.75f;
-	public float DEFUALT_RUNNING_SPEED = 4.0f;
-	public double interval;
+	public float DEFAULT_FAST_WALKING_SPEED = 3.5f;
+	public float DEFUALT_RUNNING_SPEED = 5.0f;
 	#endregion
 
 	#region Public Variables
@@ -166,7 +166,6 @@ public class HorrorAI : MonoBehaviour
 
 	public void PerformRotation(Transform trans, Vector3 currentWaypoint)
 	{
-		Debug.Log("Performing Rotation");
 		direction = (currentWaypoint - trans.position).normalized;
 		lookRotation = Quaternion.LookRotation (direction);
 		trans.rotation = Quaternion.Slerp (trans.rotation, lookRotation, Time.deltaTime * rotationSpeed);

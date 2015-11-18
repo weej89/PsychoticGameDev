@@ -25,6 +25,11 @@ public class AlertState : IEnemyState
 	{
 
 	}
+
+	public void OnStateEnter()
+	{
+
+	}
 	
 	public void ToPatrolState()
 	{
@@ -79,5 +84,10 @@ public class AlertState : IEnemyState
 
 		if(searchTimer >= enemy.searchingDuration)
 			ToPatrolState();
+	}
+
+	public string GetString()
+	{
+		return "Alert";
 	}
 }

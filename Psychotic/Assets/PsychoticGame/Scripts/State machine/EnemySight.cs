@@ -1,14 +1,19 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 public class EnemySight : MonoBehaviour 
 {
 	public float fieldOfViewAngle = 110f;
-	public bool playerInSight;
 	public float sightRange = 35f;
 	public Vector3 offset = new Vector3 (0, .5f, 0);
 	public Transform eyes;
+
 	[HideInInspector] public Transform targetLocation;
+	[HideInInspector] public bool playerInSight;
+	[HideInInspector] public bool playerInCollider;
+	[HideInInspector] public float playerLastSeenTime;
+	
 
 	private SphereCollider col;
 
@@ -29,9 +34,11 @@ public class EnemySight : MonoBehaviour
 		// If the player has entered the trigger sphere...
 		if(other.gameObject.CompareTag("Player"))
 		{
-			// By default the player is not in sight.
+			// By default the player is not in sight or collider
 			playerInSight = false;
-			
+			playerInCollider = true;
+			targetLocation = other.transform;
+
 			// Create a vector from the enemy to the player and store the angle between it and forward.
 			Vector3 direction = other.transform.position - transform.position;
 			float angle = Vector3.Angle(direction, transform.forward);
@@ -51,7 +58,8 @@ public class EnemySight : MonoBehaviour
 						// ... the player is in sight.
 						playerInSight = true;
 						targetLocation = hit.transform;
-						
+
+						playerLastSeenTime = Time.time;
 						// Set the last global sighting is the players current position.
 					}
 				}
@@ -59,9 +67,36 @@ public class EnemySight : MonoBehaviour
 		}
 	}
 
+	public bool PlayerAudible()
+	{
+		if(!playerInCollider)
+			return false;
+		else
+		{
+			float totalDistance = int.MaxValue;
+
+			PathRequestManager.RequestPath(transform.position, targetLocation.position, (Vector3[] waypoints, bool pathFound) => {
+				if(pathFound)
+				{
+					totalDistance = 0;
+					for(int i = 0; i < waypoints.Length - 1; i++)
+						totalDistance += Vector3.Distance(waypoints[i], waypoints[i+1]);
+				}
+			}, "A*", false);
+
+			if(totalDistance < col.radius)
+				return true;
+			else
+				return false;
+		}
+	}
+
 	void OnTriggerExit (Collider other)
 	{
 		if(other.gameObject.CompareTag("Player"))
+		{
+			playerInCollider = false;
 			playerInSight = false;
+		}
 	}
 }
