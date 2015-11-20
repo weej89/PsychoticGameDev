@@ -18,6 +18,7 @@ public class ChaseState : IEnemyState
 		this.zombie = zombie;
 
 		MakeDecisionTree();
+		SetNodes();
 	}
 
 	public void UpdateState()
@@ -35,7 +36,7 @@ public class ChaseState : IEnemyState
 	public void MakeDecisionTree()
 	{
 		//Is enemy in sight?
-		decisions[0] = new Decision(decisions[1], decisions[2], (object[] args)=>{
+		decisions[0] = new Decision((object[] args)=>{
 			if(enemy.enemySight.playerInSight)
 				return true;
 			else
@@ -43,7 +44,7 @@ public class ChaseState : IEnemyState
 		});
 
 		//Is search timer up?
-		decisions[1] = new Decision(decisions[3], actions[0], (object[] args) => {
+		decisions[1] = new Decision((object[] args) => {
 			if(searchTimer >= enemy.searchingDuration)
 				return true;
 			else
@@ -51,7 +52,7 @@ public class ChaseState : IEnemyState
 		});
 
 		//Less than 1 away from player?
-		decisions[2] = new Decision(actions[1], actions[2], (object[] args) => {
+		decisions[2] = new Decision((object[] args) => {
 			if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 1)
 				return true;
 			else
@@ -59,7 +60,7 @@ public class ChaseState : IEnemyState
 		});
 
 		//Is the enemy in the collider?
-		decisions[3] = new Decision(null, decisions[4], (object[] args) => {
+		decisions[3] = new Decision((object[] args) => {
 			if(enemy.enemySight.playerInCollider)
 				return true;
 			else
@@ -67,7 +68,7 @@ public class ChaseState : IEnemyState
 		});
 
 		//Is the enemy audible?
-		decisions[4] = new Decision(null, actions[3], (object[] args) => {
+		decisions[4] = new Decision((object[] args) => {
 			if(enemy.enemySight.PlayerAudible())
 				return true;
 			else
@@ -109,9 +110,19 @@ public class ChaseState : IEnemyState
 		};
 	}
 
+	private void SetNodes()
+	{
+		decisions[0].SetNodes(decisions[1], decisions[2]);
+		decisions[1].SetNodes(decisions[3], actions[0]);
+		decisions[2].SetNodes(actions[1], actions[2]);
+		decisions[3].SetNodes(null, decisions[4]);
+		decisions[4].SetNodes(null, actions[3]);
+	}
+
 	public void OnStateEnter()
 	{
 		searchTimer = 0f;
+		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
 	}
 
 	public TreeAction GetStateAction()
@@ -169,7 +180,7 @@ public class ChaseState : IEnemyState
 		searchTimer += Time.deltaTime;
 
 		if(zombie.TargetReached && PathRequestManager.IsProcessingPath == false)
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
+			zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", true);
 
 	}
 

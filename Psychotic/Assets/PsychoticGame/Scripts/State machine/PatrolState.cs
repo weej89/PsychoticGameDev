@@ -27,9 +27,9 @@ public class PatrolState : IEnemyState
 
 	public void MakeDecisionTree()
 	{
-		//Is the distance from enemy to player < 10 meters?
+		//Is the distance from enemy to player < 50 meters?
 		decisions[0] = (new Decision((object[]args) => {
-			 if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 10)
+			 if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 50)
 				return true;
 			else
 				return false;
@@ -37,7 +37,7 @@ public class PatrolState : IEnemyState
 
 		//Was the player last seen > 1 minute ago?
 		decisions[1] = (new Decision((object[]args) => {
-			if(Time.time - enemy.enemySight.playerLastSeenTime > 1)
+			if(Time.time - enemy.enemySight.playerLastSeenTime > 60)
 				return true;
 			else
 				return false;
@@ -92,6 +92,7 @@ public class PatrolState : IEnemyState
 
 		actions[3] = new TreeAction()
 		{
+			action = () => {zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", true);},
 			pathFindingMethod = "A*",
 			targetState = "Chase",
 			animation = "None"
@@ -136,6 +137,7 @@ public class PatrolState : IEnemyState
 	public void OnStateEnter()
 	{
 		GetPatrolPoint(enemy.avgPatrolInterval);
+		zombie.speed = zombie.DEFAULT_WALKING_SPEED;
 	}
 	
 	public void OnTriggerEnter(Collider other)

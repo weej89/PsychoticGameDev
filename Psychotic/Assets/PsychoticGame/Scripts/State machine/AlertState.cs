@@ -17,6 +17,7 @@ public class AlertState : IEnemyState
 		this.zombie = zombie;
 		
 		MakeDecisionTree();
+		SetNodes();
 	}
 	
 	public void UpdateState()
@@ -39,7 +40,7 @@ public class AlertState : IEnemyState
 	public void MakeDecisionTree()
 	{
 		//Is the search timer up
-		decisions[0] = new Decision(decisions[1], decisions[2], (object[] args) => {
+		decisions[0] = new Decision((object[] args) => {
 			if(searchTimer > enemy.searchingDuration)
 				return true;
 			else
@@ -47,7 +48,7 @@ public class AlertState : IEnemyState
 		});
 		
 		//Is Player In Collider
-		decisions[1] = new Decision(null, decisions[3], (object[] args) => {
+		decisions[1] = new Decision((object[] args) => {
 			if(enemy.enemySight.playerInCollider)
 				return true;
 			else
@@ -55,7 +56,7 @@ public class AlertState : IEnemyState
 		});
 		
 		//Is player less than 10 meters away
-		decisions[2] = new Decision(actions[0], actions[1], (object[] args) => {
+		decisions[2] = new Decision((object[] args) => {
 			if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 10)
 				return true;
 			else
@@ -63,7 +64,7 @@ public class AlertState : IEnemyState
 		});
 		
 		//Is the Player visible?
-		decisions[3] = new Decision(decisions[4], actions[2], (object[]args) => {
+		decisions[3] = new Decision((object[]args) => {
 			if(enemy.enemySight.playerInSight)
 				return true;
 			else
@@ -71,7 +72,7 @@ public class AlertState : IEnemyState
 		});
 		
 		//Is the Player Audible?
-		decisions[4] = new Decision(null, actions[3], (object[] args) => {
+		decisions[4] = new Decision((object[] args) => {
 			if(enemy.enemySight.PlayerAudible())
 				return true;
 			else
@@ -111,7 +112,15 @@ public class AlertState : IEnemyState
 				zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
 			}
 		};
-		
+	}
+
+	private void SetNodes()
+	{
+		decisions[0].SetNodes(decisions[1], decisions[2]);
+		decisions[1].SetNodes(null, decisions[3]);
+		decisions[2].SetNodes(actions[0], actions[1]);
+		decisions[3].SetNodes(decisions[4], actions[2]);
+		decisions[4].SetNodes(null, actions[3]);
 	}
 	
 	public void OnStateEnter()
