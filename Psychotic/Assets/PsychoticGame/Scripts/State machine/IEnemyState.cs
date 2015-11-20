@@ -11,7 +11,7 @@ public interface IEnemyState
 	void OnTriggerEnter(Collider other);
 
 	void OnStateEnter();
-
+	
 	void ToPatrolState();
 	
 	void ToAlertState();
@@ -19,4 +19,6 @@ public interface IEnemyState
 	void ToChaseState();
 
 	string GetString();
+
+	TreeAction GetStateAction();
 }

@@ -20,17 +20,15 @@ public class PatrolState : IEnemyState
 		this.enemy = statePatternEnemy;
 		this.zombie = zombie;
 		this.grid = grid;
+
+		MakeDecisionTree();
+		SetNodes();
 	}
 
-	private void ConstructTrees()
-	{
-
-	}
-
-	private void ConstructOnStateEnter()
+	public void MakeDecisionTree()
 	{
 		//Is the distance from enemy to player < 10 meters?
-		decisions[0] = (new Decision(decisions[1], decisions[2], (object[]args) => {
+		decisions[0] = (new Decision((object[]args) => {
 			 if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 10)
 				return true;
 			else
@@ -38,7 +36,7 @@ public class PatrolState : IEnemyState
 		}) {args = {}});
 
 		//Was the player last seen > 1 minute ago?
-		decisions[1] = (new Decision(actions[0], actions[1], (object[]args) => {
+		decisions[1] = (new Decision((object[]args) => {
 			if(Time.time - enemy.enemySight.playerLastSeenTime > 1)
 				return true;
 			else
@@ -46,7 +44,7 @@ public class PatrolState : IEnemyState
 		}) {args = {}});
 
 		//Is the player in the collider?
-		decisions[2] = (new Decision(actions[2], decisions[3], (object[]args) => {
+		decisions[2] = (new Decision((object[]args) => {
 			if(enemy.enemySight.playerInCollider)
 				return true;
 			else
@@ -54,7 +52,7 @@ public class PatrolState : IEnemyState
 		}) {args = {}});
 
 		//Is the Player visible?
-		decisions[3] = (new Decision(decisions[4], actions[3], (object[]args) => {
+		decisions[3] = (new Decision((object[]args) => {
 			if(enemy.enemySight.playerInSight)
 				return true;
 			else
@@ -62,7 +60,7 @@ public class PatrolState : IEnemyState
 		}) {args = {}});
 
 		//Is the player audible?
-		decisions[4] = (new Decision(actions[4], actions[5], (object[]args) => {
+		decisions[4] = (new Decision((object[]args) => {
 			if(enemy.enemySight.PlayerAudible())
 				return true;
 			else
@@ -76,18 +74,14 @@ public class PatrolState : IEnemyState
 			animation = "None"
 		};
 
-		actions[1] = new TreeAction((object[] args) => {
-			try
-			{
-				GetPatrolPoint(enemy.avgPatrolInterval);
-				return 1;
-			}
-			catch(UnityException ex)
-			{
-				Debug.Log("Exception in Getting New Patrol Point Action" +ex);
-				return 0;
-			}
-		}){	args = {}, pathFindingMethod = "A*", targetState = "Patrol", animation = "None"};
+		actions[1] = new TreeAction()
+		{
+			action = () => {GetPatrolPoint(enemy.avgPatrolInterval);},	
+			args = {}, 
+			pathFindingMethod = "A*", 
+			targetState = "Patrol", 
+			animation = "None"
+		};
 
 		actions[2] = new TreeAction()
 		{
@@ -112,22 +106,36 @@ public class PatrolState : IEnemyState
 
 		actions[5] = new TreeAction()
 		{
+			action = () => {
+				if(zombie.TargetReached)
+					zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
+			},
 			pathFindingMethod = "A*",
 			targetState = "Alert",
 			animation = "None"
 		};
 	}
 
+	public void SetNodes()
+	{
+		decisions[0].SetNodes(decisions[1], decisions[2]);
+		decisions[1].SetNodes(actions[0], actions[1]);
+		decisions[2].SetNodes(actions[2], decisions[3]);
+		decisions[3].SetNodes(decisions[4], actions[3]);
+		decisions[4].SetNodes(actions[4], actions[5]);
+	
+	}
+
 	public void UpdateState()
 	{
 		Debug.Log("IN PATROL");
-		Look();
+		//Look();
 		Patrol();
 	}
 
 	public void OnStateEnter()
 	{
-		
+		GetPatrolPoint(enemy.avgPatrolInterval);
 	}
 	
 	public void OnTriggerEnter(Collider other)
@@ -135,7 +143,12 @@ public class PatrolState : IEnemyState
 		//if(other.gameObject.CompareTag("Player"))
 			//ToAlertState();
 	}
-	
+
+	public TreeAction GetStateAction()
+	{
+		return decisions[0].MakeDecision(decisions[0].GetBranch());
+	}	
+
 	public void ToPatrolState()
 	{
 		Debug.Log("Can't transition to same state");

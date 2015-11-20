@@ -11,22 +11,16 @@ public class TreeAction : DecisionTreeNode {
 	public int priority;
 	public string targetState;
 
+
 	public object[] args;
-	private Func<object[], int> function;
+	public Action action = null;
 
 	public TreeAction()
 	{
-		this.function = null;
-	}
-
-	public TreeAction(Func<object[] ,int> function)
-	{
-		this.function = function;
 	}
 
 	public TreeAction(ref Transform _targetPos)
 	{
-		this.function = null;
 		this.targetPos = _targetPos;
 	}
 	

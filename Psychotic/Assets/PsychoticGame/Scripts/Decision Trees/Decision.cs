@@ -11,6 +11,11 @@ public class Decision : DecisionTreeNode
 	protected string operation = string.Empty;
 	public enum TestCondition{LESS_THAN, EQUAL_TO, GREATER_THAN, NOT_EQUAL}
 
+	public Decision(Func<object[], bool> _determining)
+	{
+		this.determining = _determining;
+	}
+
 	public Decision(DecisionTreeNode _falseNode, DecisionTreeNode _trueNode, Func<object[], bool> _determining)
 		:base(_falseNode, _trueNode)
 	{
@@ -25,16 +30,25 @@ public class Decision : DecisionTreeNode
 			return falseNode;
 	}
 
+	public void SetNodes(DecisionTreeNode _falseNode, DecisionTreeNode _trueNode)
+	{
+		this.trueNode = _trueNode;
+		this.falseNode = _falseNode;
+	}
+
 	public override TreeAction MakeDecision (DecisionTreeNode root)
 	{
-		DecisionTreeNode decision = GetBranch();
+		//DecisionTreeNode decision = GetBranch();
 
-		if(decision is TreeAction)
+		if(root == null)
+			return null;
+
+		if(root is TreeAction)
 		{
-			TreeAction action = (TreeAction) decision;
+			TreeAction action = (TreeAction) root;
 			return action;
 		}
 
-		return MakeDecision(decision);
+		return MakeDecision(root.GetBranch());
 	}
 }

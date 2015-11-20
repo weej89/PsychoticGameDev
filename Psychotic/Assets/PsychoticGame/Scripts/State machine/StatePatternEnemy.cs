@@ -59,6 +59,7 @@ public class StatePatternEnemy : MonoBehaviour
 	void Update () 
 	{
 		currentState.UpdateState();
+		PerformAction(currentState.GetStateAction());
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -68,11 +69,17 @@ public class StatePatternEnemy : MonoBehaviour
 
 	public void PerformAction(TreeAction action)
 	{
-		pathfindingStrategy = action.pathFindingMethod;
-		enemy.target = action.targetPos;
+		if(action != null)
+		{
+			pathfindingStrategy = action.pathFindingMethod;
+			//enemy.target = action.targetPos;
 
-		if(currentState.GetString() != action.targetState)
-			PerformStateTransition(action.targetState);
+			if(currentState.GetString() != action.targetState)
+				PerformStateTransition(action.targetState);
+
+			if(action.action != null)
+				action.action.DynamicInvoke();
+		}
 	}
 
 	private void PerformStateTransition(string state)
