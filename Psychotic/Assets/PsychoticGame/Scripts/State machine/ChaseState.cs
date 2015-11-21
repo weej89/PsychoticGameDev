@@ -53,7 +53,8 @@ public class ChaseState : IEnemyState
 
 		//Less than 1 away from player?
 		decisions[2] = new Decision((object[] args) => {
-			if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 1)
+			Debug.Log("Distance:  " +Vector3.Distance(zombie.transform.position, zombie.target.position));
+			if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 2)
 				return true;
 			else
 				return false;
@@ -180,7 +181,7 @@ public class ChaseState : IEnemyState
 		searchTimer += Time.deltaTime;
 
 		if(zombie.TargetReached && PathRequestManager.IsProcessingPath == false)
-			zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", true);
+			zombie.CallForNewPath(enemy.enemySight.targetLocation.position, enemy.pathfindingStrategy, true);
 
 	}
 

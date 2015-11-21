@@ -43,10 +43,28 @@ public class Grid : MonoBehaviour {
 		}
 		CreateGrid();
 
+		HashSet<Node> nodesSeen = new HashSet<Node>();
+
+		/*
 		foreach(Node node in grid)
 		{
-			DetermineMovementPenalty(node, 5);
+			DetermineMovementPenalty(nodesSeen, node, 5);
 		}
+		*/
+
+		for(int r = 0; r<gridSizeX; r++)
+		{
+			for(int c = 0; c<gridSizeY; c++)
+			{
+				Node node = grid[r,c];
+				DetermineMovementPenalty(nodesSeen, node, 5);
+			}
+
+			foreach(Node n in grid)
+				if(n.movementPenalty > 0)
+					nodesSeen.Add(n);
+		}
+
 	}
 	#endregion
 
@@ -129,19 +147,19 @@ public class Grid : MonoBehaviour {
 	}
 	#endregion
 
-	public void DetermineMovementPenalty(Node node, int penalty)
+	public void DetermineMovementPenalty(HashSet<Node> seenNodes, Node node, int penalty)
 	{
 		if(penalty > 0)
 		{
 			foreach(Node n in GetNeighbors(node))
 			{
-				if(!n.walkable || node.movementPenalty > 0)
+				if((!n.walkable || node.movementPenalty > 0) && !seenNodes.Contains(n) )
 				{
 					node.movementPenalty += penalty;
-					DetermineMovementPenalty(n, penalty-1);
+					DetermineMovementPenalty(seenNodes, n, penalty-1);
 				}
 			}
-		}		
+		}
 	}
 
 	#region NodeFromWorldPoint

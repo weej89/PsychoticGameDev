@@ -7,6 +7,8 @@ public class AnimationController : MonoBehaviour
 	StatePatternEnemy state;
 	Animator anim;
 
+	bool playingTriggerAnimation = false;
+	string currentlyPlayingAnimation = string.Empty;
 
 	// Use this for initialization
 	void Start () 
@@ -24,5 +26,18 @@ public class AnimationController : MonoBehaviour
 		anim.SetFloat("Speed", enemySpeed);
 	}
 
-
+	public void PerformTriggerAnimation(string animation)
+	{	
+		if(!playingTriggerAnimation && animation != "None")
+		{
+			anim.SetTrigger(animation);
+			playingTriggerAnimation = true;
+			currentlyPlayingAnimation = animation;
+		}
+		else if(animation == "None")
+		{
+			anim.ResetTrigger(currentlyPlayingAnimation);
+			playingTriggerAnimation = false;
+		}
+	}
 }

@@ -23,34 +23,35 @@ public class StatePatternEnemy : MonoBehaviour
 	[HideInInspector] public ChaseState chaseState;
 	[HideInInspector] public AlertState alertState;
 	[HideInInspector] public PatrolState patrolState;
-	[HideInInspector] public Animator anim;
+	[HideInInspector] public AnimationController anim;
 	[HideInInspector] public EnemySight enemySight;
 
 	[HideInInspector] public string pathfindingStrategy;
 
 
-	/*
+
 	private HorrorAI enemy;
 	private Grid grid;
-	*/
+	private bool playingTriggerAnimation = false;
 
-	public HorrorAI enemy;
-	public Grid grid;
 	private void Awake()
 	{
-		//GameObject pathFinding = GameObject.Find("A*");
-		//enemy = GetComponent<HorrorAI>();
-		//grid = pathFinding.GetComponent<Grid>();
+		GameObject pathFinding = GameObject.Find("Pathfinding");
+		enemy = GetComponent<HorrorAI>();
+		grid = pathFinding.GetComponent<Grid>();
 		enemySight = GetComponent<EnemySight> ();
+
 		chaseState = new ChaseState(this, enemy);
 		alertState = new AlertState(this, enemy);
 		patrolState = new PatrolState(this, enemy, grid);
+
+		pathfindingStrategy = "A*";
 
 	}
 	// Use this for initialization
 	void Start () 
 	{
-		anim = GetComponent<Animator>();
+		anim = GetComponent<AnimationController>();
 		patrolState.GetPatrolPoint(15.0);
 		currentState = patrolState;	
 	}
@@ -79,6 +80,8 @@ public class StatePatternEnemy : MonoBehaviour
 
 			if(action.action != null)
 				action.action.DynamicInvoke();
+
+			anim.PerformTriggerAnimation(action.animation);
 		}
 	}
 
@@ -99,6 +102,8 @@ public class StatePatternEnemy : MonoBehaviour
 
 		currentState.OnStateEnter();
 	}
+
+
 
 	public void OnDrawGizmos()
 	{
