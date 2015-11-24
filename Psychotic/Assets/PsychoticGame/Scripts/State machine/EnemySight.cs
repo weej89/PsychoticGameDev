@@ -13,9 +13,10 @@ public class EnemySight : MonoBehaviour
 	[HideInInspector] public bool playerInSight;
 	[HideInInspector] public bool playerInCollider;
 	[HideInInspector] public float playerLastSeenTime;
-	
 
 	private SphereCollider col;
+	private float timeSinceAudibleCheck = 0;
+	private const int AUDIBLE_COOLDOWN = 4000;
 
 	// Use this for initialization
 	void Start () 
@@ -26,7 +27,8 @@ public class EnemySight : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		
+		timeSinceAudibleCheck+=Time.deltaTime;
+		playerLastSeenTime += Time.deltaTime;
 	}
 
 	void OnTriggerStay (Collider other)
@@ -59,7 +61,7 @@ public class EnemySight : MonoBehaviour
 						playerInSight = true;
 						targetLocation = hit.transform;
 
-						playerLastSeenTime = Time.time;
+						playerLastSeenTime = 0;
 						// Set the last global sighting is the players current position.
 					}
 				}
@@ -67,22 +69,24 @@ public class EnemySight : MonoBehaviour
 		}
 	}
 
-	public bool PlayerAudible()
+	public bool PlayerAudible(Vector3 position, Vector3 targetPosition)
 	{
-		if(!playerInCollider)
+		if(!playerInCollider || PathRequestManager.IsInQueue(GetInstanceID()) || timeSinceAudibleCheck < AUDIBLE_COOLDOWN)
 			return false;
 		else
 		{
 			float totalDistance = int.MaxValue;
-
-			PathRequestManager.RequestPath(transform.position, targetLocation.position, (Vector3[] waypoints, bool pathFound) => {
+			Debug.Log("Path Request From Enemy View");
+			PathRequestManager.RequestPath(position, targetPosition, (Vector3[] waypoints, bool pathFound) => {
 				if(pathFound)
 				{
 					totalDistance = 0;
 					for(int i = 0; i < waypoints.Length - 1; i++)
 						totalDistance += Vector3.Distance(waypoints[i], waypoints[i+1]);
 				}
-			}, "A*", false);
+			}, "A*", false, GetInstanceID());
+
+			timeSinceAudibleCheck = 0;
 
 			if(totalDistance < col.radius)
 				return true;

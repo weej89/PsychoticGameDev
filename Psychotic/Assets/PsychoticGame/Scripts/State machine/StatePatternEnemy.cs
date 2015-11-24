@@ -1,5 +1,8 @@
 using UnityEngine;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
 
 public class StatePatternEnemy : MonoBehaviour
 {
@@ -33,6 +36,9 @@ public class StatePatternEnemy : MonoBehaviour
 	private HorrorAI enemy;
 	private Grid grid;
 	private bool playingTriggerAnimation = false;
+	private float decisionTime = 0;
+	private const float DECISION_COOLDOWN = .1f;
+	private Queue<TreeAction> processedActions;
 
 	private void Awake()
 	{
@@ -47,6 +53,7 @@ public class StatePatternEnemy : MonoBehaviour
 
 		pathfindingStrategy = "A*";
 
+		processedActions = new Queue<TreeAction>();
 	}
 	// Use this for initialization
 	void Start () 
@@ -60,12 +67,24 @@ public class StatePatternEnemy : MonoBehaviour
 	void Update () 
 	{
 		currentState.UpdateState();
-		PerformAction(currentState.GetStateAction());
+
+		decisionTime += Time.deltaTime;
+
+		if(decisionTime >= DECISION_COOLDOWN)
+		{
+			currentState.GetStateAction();
+			decisionTime = 0;
+		}
+
+		if(processedActions.Count > 0)
+		{
+			PerformAction(processedActions.Dequeue());
+		}
 	}
 
-	private void OnTriggerEnter(Collider other)
+	public void AddActionToQueue(TreeAction action)
 	{
-		currentState.OnTriggerEnter(other);
+		processedActions.Enqueue(action);
 	}
 
 	public void PerformAction(TreeAction action)

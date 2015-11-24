@@ -45,13 +45,6 @@ public class Grid : MonoBehaviour {
 
 		HashSet<Node> nodesSeen = new HashSet<Node>();
 
-		/*
-		foreach(Node node in grid)
-		{
-			DetermineMovementPenalty(nodesSeen, node, 5);
-		}
-		*/
-
 		for(int r = 0; r<gridSizeX; r++)
 		{
 			for(int c = 0; c<gridSizeY; c++)
@@ -113,6 +106,24 @@ public class Grid : MonoBehaviour {
 	}
 	#endregion
 
+	#region GetGridCopy
+	public Node[,] GetGridCopy()
+	{
+		Node[,] newGrid = new Node[gridSizeX,gridSizeY];
+
+		for(int r = 0; r < gridSizeX; r++)
+		{
+			for(int c = 0; c < gridSizeY; c++)
+			{
+				Node copyNode = grid[r,c];
+				newGrid[r,c] = new Node(copyNode.walkable, copyNode.worldPosition, r, c, copyNode.movementPenalty);
+			}
+		}
+
+		return newGrid;
+	}
+	#endregion
+
 
 	#region GetNeighbors
 	/// <summary>
@@ -123,7 +134,6 @@ public class Grid : MonoBehaviour {
 	public List<Node> GetNeighbors(Node node)
 	{
 		List<Node> neighbors = new List<Node>();
-		//int movmentPenalty = 0;
 
 		for(int x=-1; x<=1; x++)
 		{
@@ -138,7 +148,31 @@ public class Grid : MonoBehaviour {
 				if(checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
 				{
 					neighbors.Add(grid[checkX, checkY]);
-					//DetermineMovementPenalty(grid[checkX, checkY], 5);
+				}
+			}
+		}
+		
+		return neighbors;
+	}
+
+	//New Method for copy
+	public List<Node> GetNeighbors(Node[,] otherGrid, Node node)
+	{
+		List<Node> neighbors = new List<Node>();
+
+		for(int x=-1; x<=1; x++)
+		{
+			for(int y=-1; y<=1; y++)
+			{
+				if(x==0 && y==0)
+					continue;
+				
+				int checkX = node.gridX + x;
+				int checkY = node.gridY + y;
+				
+				if(checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
+				{
+					neighbors.Add(otherGrid[checkX, checkY]);
 				}
 			}
 		}
@@ -181,6 +215,21 @@ public class Grid : MonoBehaviour {
 
 		return grid[x,y];
 	}
+
+	//New method for grid copy
+	public Node NodeFromWorldPoint(Node[,] otherGrid, Vector3 worldPosition)
+	{
+		float percentX = (worldPosition.x + gridWorldSize.x/2) / gridWorldSize.x;
+		float percentY = (worldPosition.z + gridWorldSize.y/2) / gridWorldSize.y;
+		
+		percentX = Mathf.Clamp01(percentX);
+		percentY = Mathf.Clamp01(percentY);
+		
+		int x = Mathf.RoundToInt((gridSizeX - 1) * percentX);
+		int y = Mathf.RoundToInt((gridSizeY - 1) * percentY);
+		
+		return otherGrid[x,y];
+	}
 	#endregion
 
 	#region OnDrawGizmos
@@ -222,6 +271,14 @@ public class Grid : MonoBehaviour {
 	public void ResetNodes()
 	{
 		foreach(Node n in grid)
+		{
+			n.parent = null;
+		}
+	}
+
+	public void ResetNodes(Node[,] otherGrid)
+	{
+		foreach(Node n in otherGrid)
 		{
 			n.parent = null;
 		}

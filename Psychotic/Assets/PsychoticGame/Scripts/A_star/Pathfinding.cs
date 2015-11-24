@@ -4,12 +4,14 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 #endregion
 
 public class Pathfinding : MonoBehaviour 
 {
 	#region Private Variables
 	PathRequestManager requestManager;
+	List<GridPath> paths = new List<GridPath>();
 	Grid grid;
 
 	List<Node> checkedNodes = new List<Node>();
@@ -27,154 +29,49 @@ public class Pathfinding : MonoBehaviour
 		grid=GetComponent<Grid>();
 	}
 	#endregion
-		
-	#region A* Pathfinding
-	public IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos, bool lineOfSight)
+
+	#region Update
+	void Update()
 	{
-		Stopwatch sw = new Stopwatch();
-		sw.Start();
+		for(int i = paths.Count - 1; i>=0; i--)
+		{
+			GridPath path = paths[i];
 
-		Vector3[] waypoints = new Vector3[0];
-		
-		bool pathSuccess = false;
-		
-		Node startNode = grid.NodeFromWorldPoint(startPos);
-		Node targetNode = grid.NodeFromWorldPoint(targetPos);
-		
-		if (startNode.walkable && targetNode.walkable) {
-			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
-			HashSet<Node> closedSet = new HashSet<Node>();
-			openSet.Add(startNode);
-			
-			while (openSet.Count > 0) {
-				Node currentNode = openSet.RemoveFirst();
-				closedSet.Add(currentNode);
-				
-				if (currentNode == targetNode) {
-					sw.Stop();
-					print ("Path found: " + sw.ElapsedMilliseconds + " ms");
-					pathSuccess = true;
-					break;
-				}
-				
-				foreach (Node neighbour in grid.GetNeighbors(currentNode)) {
-					if (!neighbour.walkable || closedSet.Contains(neighbour)) {
-						continue;
-					}
-					
-					int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
-
-					if(lineOfSight == true)
-					{
-						if (currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour) < neighbour.gCost && !openSet.Contains(neighbour) && currentNode != startNode)
-						{
-							neighbour.parent = currentNode.parent;
-							neighbour.gCost = currentNode.parent.gCost + GetDistance(currentNode.parent, neighbour);
-						}
-						else if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) {
-							neighbour.gCost = newMovementCostToNeighbour;
-							neighbour.hCost = GetDistance(neighbour, targetNode);
-							neighbour.parent = currentNode;
-							
-							if (!openSet.Contains(neighbour))
-								openSet.Add(neighbour);
-						}
-					}
-					else
-					{
-						if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour)) {
-							neighbour.gCost = newMovementCostToNeighbour;
-							neighbour.hCost = GetDistance(neighbour, targetNode);
-							neighbour.parent = currentNode;
-							
-							if (!openSet.Contains(neighbour))
-								openSet.Add(neighbour);
-						}
-					}
-				}
+			if(path.GetEventDone)
+			{
+				paths.RemoveAt(i);
+				requestManager.FinishedProcessingPath(path);
 			}
 		}
+	}
+	#endregion
+		
+	#region A* Pathfinding
+	public IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos, bool lineOfSight, Action<Vector3[], bool> callback, int pathId)
+	{
+		//Added for mesh copy O(n2) heavy
+		Node[,] meshCopy = grid.GetGridCopy();
 
 		yield return null;
 
-		if (pathSuccess) {
-			waypoints = RetracePath(startNode,targetNode);
-		}
-
-		requestManager.FinishedProcessingPath(waypoints, pathSuccess);
-	}
+		UnityEngine.Debug.Log("Going into thread");
+		AStarPath aStar = new AStarPath(grid, meshCopy, startPos, targetPos, lineOfSight, callback, pathId);
+		paths.Add(aStar);
+		ThreadPool.QueueUserWorkItem(aStar.ThreadPoolCallback, paths.Count);
+}
 	#endregion
 	
 	#region IterativeDeepeningSearch
-	public IEnumerator IterativeDeepening(Vector3 startPoint, Vector3 targetPos)
+	public IEnumerator IterativeDeepening(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId)
 	{
-		grid.ResetNodes();
-
-		HashSet<Node> visitedHash = new HashSet<Node>();
-		Node startNode = grid.NodeFromWorldPoint(startPoint);
-		Node targetNode = grid.NodeFromWorldPoint(targetPos);
-		visitedHash.Add(startNode);
-
-		Vector3[] waypoints = new Vector3[0];
+		//Added for mesh copy O(n2) heavy
+		Node[,] meshCopy = grid.GetGridCopy();
 		
-		int depth = 0;
-		bool targetFound = false;
-
-		Stopwatch sw = new Stopwatch();
-		sw.Start();
-
-		while(!targetFound && visitedHash.Count < grid.MaxSize)
-		{
-			targetFound = Deepening(startNode, depth, visitedHash, targetNode);
-
-			visitedHash.RemoveWhere(n => n.parent != null && n != startNode);
-
-			depth++;
-		}
-
-		sw.Stop();
-		print ("Path found: " + sw.ElapsedMilliseconds + " ms");
-
 		yield return null;
-
-		if(targetFound)
-			waypoints = RetracePath(startNode, targetNode);
-
-		requestManager.FinishedProcessingPath(waypoints, targetFound);
-	}
-
-	bool Deepening(Node root, int depth, HashSet<Node> visitedHash, Node target)
-	{
-		bool targetFound = false;
-		Heap<Node> nodeHeap = new Heap<Node>(8);
-
-		if(depth >= 0)
-		{
-			if(root == target)
-			{
-				return true;
-			}
-			else
-			{
-				foreach(Node n in grid.GetNeighbors(root))
-				{
-					if(!visitedHash.Contains(n) && n.walkable)
-					{
-						n.hCost = GetDistance(n, target);
-						nodeHeap.Add(n);
-						visitedHash.Add(n);
-					}
-				}
-
-				while(nodeHeap.Count > 0 && targetFound == false)
-				{
-					Node node = nodeHeap.RemoveFirst();
-					node.parent = root;
-					targetFound = Deepening(node, depth-1, visitedHash, target);
-				}
-			}
-		}
-		return targetFound;
+		UnityEngine.Debug.Log("Going into thread");
+		IDeepeningPath iDeepening = new IDeepeningPath(grid, meshCopy, startPos, targetPos, callback, pathId);
+		paths.Add(iDeepening);
+		ThreadPool.QueueUserWorkItem(iDeepening.ThreadPoolCallback, paths.Count);
 	}
 	#endregion
 

@@ -7,8 +7,8 @@ public class AnimationController : MonoBehaviour
 	StatePatternEnemy state;
 	Animator anim;
 
-	bool playingTriggerAnimation = false;
-	string currentlyPlayingAnimation = string.Empty;
+	int attack01Hash = Animator.StringToHash("Attack01");
+	int attack02Hash = Animator.StringToHash("Attack02");
 
 	// Use this for initialization
 	void Start () 
@@ -23,21 +23,19 @@ public class AnimationController : MonoBehaviour
 	void Update () 
 	{
 		float enemySpeed = zombie.speed;
-		anim.SetFloat("Speed", enemySpeed);
+		anim.SetFloat("Speed", enemySpeed);		
 	}
 
 	public void PerformTriggerAnimation(string animation)
 	{	
-		if(!playingTriggerAnimation && animation != "None")
+		switch(animation)
 		{
-			anim.SetTrigger(animation);
-			playingTriggerAnimation = true;
-			currentlyPlayingAnimation = animation;
-		}
-		else if(animation == "None")
-		{
-			anim.ResetTrigger(currentlyPlayingAnimation);
-			playingTriggerAnimation = false;
+			case "attack01":
+			anim.SetTrigger("Attack01");
+			break;
+			case "attack02":
+			anim.SetTrigger("Attack02");
+			break;
 		}
 	}
 }

@@ -8,17 +8,9 @@ public interface IEnemyState
 {
 	void UpdateState();
 
-	void OnTriggerEnter(Collider other);
-
 	void OnStateEnter();
-	
-	void ToPatrolState();
-	
-	void ToAlertState();
-
-	void ToChaseState();
 
 	string GetString();
 
-	TreeAction GetStateAction();
+	void GetStateAction();
 }

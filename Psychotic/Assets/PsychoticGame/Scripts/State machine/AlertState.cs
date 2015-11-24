@@ -7,9 +7,12 @@ public class AlertState : IEnemyState
 	private readonly StatePatternEnemy enemy;
 	private float searchTimer = 0f;
 	private HorrorAI zombie;
+	private Vector3 playerPos, zombiePos;
 	
 	private Decision[] decisions = new Decision[5];
 	private TreeAction[] actions = new TreeAction[4];
+
+	private DecisionTree decisionTree;
 	
 	public AlertState(StatePatternEnemy statePatternEnemy, HorrorAI zombie)
 	{
@@ -18,25 +21,23 @@ public class AlertState : IEnemyState
 		
 		MakeDecisionTree();
 		SetNodes();
+
+		decisionTree = new DecisionTree(decisions, actions, enemy.AddActionToQueue);
 	}
 	
 	public void UpdateState()
 	{
-		Debug.Log("IN ALERT");
-		//Look();
+		playerPos = zombie.target.position;
+		zombiePos = zombie.transform.position;
 		Search();
 	}
 	
-	public TreeAction GetStateAction()
+	public void GetStateAction()
 	{
-		return decisions[0].MakeDecision(decisions[0].GetBranch());
+		if(decisionTree.EventCompleted)
+			decisionTree.StartDecisionProcess();
 	}
-	
-	public void OnTriggerEnter(Collider other)
-	{
-		
-	}
-	
+
 	public void MakeDecisionTree()
 	{
 		//Is the search timer up
@@ -57,7 +58,7 @@ public class AlertState : IEnemyState
 		
 		//Is player less than 10 meters away
 		decisions[2] = new Decision((object[] args) => {
-			if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 10)
+			if(Vector3.Distance(zombiePos, playerPos) < 10)
 				return true;
 			else
 				return false;
@@ -73,7 +74,7 @@ public class AlertState : IEnemyState
 		
 		//Is the Player Audible?
 		decisions[4] = new Decision((object[] args) => {
-			if(enemy.enemySight.PlayerAudible())
+			if(enemy.enemySight.PlayerAudible(zombiePos, playerPos))
 				return true;
 			else
 				return false;
@@ -109,7 +110,7 @@ public class AlertState : IEnemyState
 			animation = "None",
 			action = () => {
 				if(zombie.TargetReached)
-				zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
+					zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
 			}
 		};
 	}
@@ -127,51 +128,7 @@ public class AlertState : IEnemyState
 	{
 		searchTimer = 0f;
 	}
-	
-	
-	public void ToPatrolState()
-	{
-		enemy.patrolState.GetPatrolPoint(enemy.patrolState.GetNextRandomInterval(enemy.avgPatrolInterval));
-		enemy.currentState = enemy.patrolState;
-		searchTimer = 0f;
-		zombie.speed = zombie.DEFAULT_WALKING_SPEED;
-	}
-	
-	public void ToAlertState()
-	{
-		Debug.Log("Can't transition to same state");
-	}
-	
-	public void ToChaseState()
-	{
-		enemy.currentState = enemy.chaseState;
-		searchTimer = 0f;
-		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
-	}
-	
-	private void Look()
-	{
-		/*
-		RaycastHit hit;
-		
-		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
-		{
-			Debug.DrawLine(enemy.eyes.transform.position, new Vector3(enemy.eyes.transform.forward.x, enemy.eyes.transform.forward.y, enemy.eyes.transform.forward.z + enemy.sightRange));
 
-			enemy.chaseTarget = hit.transform;
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
-
-			ToChaseState();
-		}
-		*/
-		if(enemy.enemySight.playerInSight)
-		{
-			enemy.chaseTarget = enemy.enemySight.targetLocation;
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
-			ToChaseState();
-		}
-	}
-	
 	private void Search()
 	{
 		//Add new pathfinding stuff

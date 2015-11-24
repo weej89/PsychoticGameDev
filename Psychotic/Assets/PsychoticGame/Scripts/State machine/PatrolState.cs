@@ -10,8 +10,11 @@ public class PatrolState : IEnemyState
 	private double currentTime = 0;
 	private Grid grid;
 
+	private Vector3 playerPos, zombiePos;
+
 	private Decision[] decisions = new Decision[5];
 	private TreeAction[] actions = new TreeAction[6];
+	private DecisionTree decisionTree;
 
 	public TargetArea targetArea;
 
@@ -20,28 +23,30 @@ public class PatrolState : IEnemyState
 		this.enemy = statePatternEnemy;
 		this.zombie = zombie;
 		this.grid = grid;
-
+		
 		MakeDecisionTree();
 		SetNodes();
+
+		decisionTree = new DecisionTree(decisions, actions, enemy.AddActionToQueue);
 	}
 
 	public void MakeDecisionTree()
 	{
 		//Is the distance from enemy to player < 50 meters?
 		decisions[0] = (new Decision((object[]args) => {
-			 if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 50)
+			 if(Vector3.Distance(zombiePos, playerPos) < 50)
 				return true;
 			else
 				return false;
-		}) {args = {}});
+		}));
 
-		//Was the player last seen > 1 minute ago?
+		//Was the player last seen >  30 secs ago?
 		decisions[1] = (new Decision((object[]args) => {
-			if(Time.time - enemy.enemySight.playerLastSeenTime > 60)
+			if(enemy.enemySight.playerLastSeenTime > 30)
 				return true;
 			else
 				return false;
-		}) {args = {}});
+		}));
 
 		//Is the player in the collider?
 		decisions[2] = (new Decision((object[]args) => {
@@ -49,7 +54,7 @@ public class PatrolState : IEnemyState
 				return true;
 			else
 				return false;
-		}) {args = {}});
+		}));
 
 		//Is the Player visible?
 		decisions[3] = (new Decision((object[]args) => {
@@ -57,15 +62,15 @@ public class PatrolState : IEnemyState
 				return true;
 			else
 				return false;
-		}) {args = {}});
+		}));
 
 		//Is the player audible?
 		decisions[4] = (new Decision((object[]args) => {
-			if(enemy.enemySight.PlayerAudible())
+			if(enemy.enemySight.PlayerAudible(zombiePos, playerPos))
 				return true;
 			else
 				return false;
-		}) {args = {}});
+		}));
 		
 		actions[0] = new TreeAction()
 		{
@@ -92,7 +97,6 @@ public class PatrolState : IEnemyState
 
 		actions[3] = new TreeAction()
 		{
-			action = () => {zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", true);},
 			pathFindingMethod = "A*",
 			targetState = "Chase",
 			animation = "None"
@@ -129,8 +133,9 @@ public class PatrolState : IEnemyState
 
 	public void UpdateState()
 	{
-		Debug.Log("IN PATROL");
-		//Look();
+		playerPos = zombie.target.position;
+		zombiePos = zombie.transform.position;
+
 		Patrol();
 	}
 
@@ -139,34 +144,12 @@ public class PatrolState : IEnemyState
 		GetPatrolPoint(enemy.avgPatrolInterval);
 		zombie.speed = zombie.DEFAULT_WALKING_SPEED;
 	}
-	
-	public void OnTriggerEnter(Collider other)
-	{
-		//if(other.gameObject.CompareTag("Player"))
-			//ToAlertState();
-	}
 
-	public TreeAction GetStateAction()
+	public void GetStateAction()
 	{
-		return decisions[0].MakeDecision(decisions[0].GetBranch());
+		if(decisionTree.EventCompleted)
+			decisionTree.StartDecisionProcess();
 	}	
-
-	public void ToPatrolState()
-	{
-		Debug.Log("Can't transition to same state");
-	}
-	
-	public void ToAlertState()
-	{
-		enemy.currentState = enemy.alertState;
-		zombie.speed = 0;
-	}
-	
-	public void ToChaseState()
-	{
-		enemy.currentState = enemy.chaseState;
-		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
-	}
 
 	public void GetPatrolPoint(double avgInterval)
 	{
@@ -175,37 +158,18 @@ public class PatrolState : IEnemyState
 		currentTime = 0;
 	}
 
-	private void Look()
-	{
-		/*
-		RaycastHit hit;
-
-		if(Physics.Raycast(enemy.eyes.transform.position, enemy.eyes.transform.forward, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
-		{
-			enemy.chaseTarget = hit.transform;
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
-			ToChaseState();
-		}
-		*/
-
-		if(enemy.enemySight.playerInSight)
-		{
-			enemy.chaseTarget = enemy.enemySight.targetLocation;
-			zombie.CallForNewPath(enemy.chaseTarget.transform.position, "A*", true);
-			ToChaseState();
-		}
-	}
-
 	void Patrol()
 	{
 		enemy.meshRendererFlag.material.color = Color.green;
-		//Add patrolling code here for pathfinding
-		//Add decision tree stuff here for determining behaviors
-		if(zombie.TargetReached && currentTime < patrolTime && PathRequestManager.IsProcessingPath == false)
+
+		if(zombie.TargetReached && currentTime < patrolTime && !PathRequestManager.IsInQueue(zombie.GetInstanceID()))
 		{
 			Vector3 target = targetArea.GenerateCheckingPath();
+			Debug.Log("Zombie ID in patrol" +zombie.GetInstanceID());
 					
 			zombie.CallForNewPath(target, enemy.pathfindingStrategy, false);
+			Debug.Log("Path Request From Patrol State");
+
 		}
 		else if (currentTime > patrolTime)
 		{

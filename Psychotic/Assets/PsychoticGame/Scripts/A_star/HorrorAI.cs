@@ -72,7 +72,7 @@ public class HorrorAI : MonoBehaviour
 	/// </summary>
 	public void CallForNewPath (Vector3 newTarget, string pathType, bool lineOfSight)
 	{
-		PathRequestManager.RequestPath (transform.position, newTarget, OnPathFound, pathType, lineOfSight);
+		PathRequestManager.RequestPath (transform.position, newTarget, OnPathFound, pathType, lineOfSight, GetInstanceID());
 	}
 	#endregion
 
@@ -105,20 +105,31 @@ public class HorrorAI : MonoBehaviour
 		//Check for actual path and yield return null if path is empty
 		Vector3 currentWaypoint = path [0];
 
-		while (true) {
-			if (WithinOne (currentWaypoint)) {
-				targetIndex++;
-				if (targetIndex >= path.Length) {
-					targetReached = true;
-					targetIndex = 0;
-					yield break;
+		while (true) 
+		{
+			try
+			{
+				if (WithinOne (currentWaypoint)) 
+				{
+					targetIndex++;
+					if (targetIndex >= path.Length) 
+					{
+						targetReached = true;
+						targetIndex = 0;
+						yield break;
+					}
+					currentWaypoint = path [targetIndex];
 				}
-				currentWaypoint = path [targetIndex];
+
+				PerformRotation(this.transform, currentWaypoint);
+				transform.position = Vector3.MoveTowards (transform.position, currentWaypoint, speed * Time.deltaTime);
 			}
-
-			PerformRotation(this.transform, currentWaypoint);
-			transform.position = Vector3.MoveTowards (transform.position, currentWaypoint, speed * Time.deltaTime);
-
+			catch(UnityException ex)
+			{
+				Debug.LogError("Error in Follow Path" +ex.ToString());
+				targetReached = true;
+				targetIndex = 0;
+			}
 			yield return null;
 		}
 	}

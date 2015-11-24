@@ -1,4 +1,4 @@
-﻿#region Using
+#region Using
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,13 +8,17 @@ using System.Collections;
 public class PathRequestManager : MonoBehaviour {
 
 	#region Private Variables
+	const int MAX_WORKING_PATHS = 4;
+
 	Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
 	PathRequest currentPathRequest;
-	
+	int numWorkingPaths = 0;
+
+	static List<int> enemysInQueue = new List<int>();
 	static PathRequestManager instance;
 	Pathfinding pathfinding;
 	
-	bool isProcessingPath;
+	bool isProcessingPath = false;
 	#endregion
 
 	public static bool IsProcessingPath
@@ -22,6 +26,8 @@ public class PathRequestManager : MonoBehaviour {
 		get{return instance.isProcessingPath;}
 	}
 
+	public static bool IsInQueue(int id)
+	{return enemysInQueue.Contains(id);}
 	#region Awake
 	/// <summary>
 	/// Awake this instance.
@@ -41,8 +47,9 @@ public class PathRequestManager : MonoBehaviour {
 	/// <param name="pathStart">Path start.</param>
 	/// <param name="pathEnd">Path end.</param>
 	/// <param name="callback">Callback.</param>
-	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback, string pathType, bool lineOfSight) {
-		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback, pathType, lineOfSight);
+	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback, string pathType, bool lineOfSight, int id) {
+		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback, pathType, lineOfSight, id);
+		enemysInQueue.Add(id);
 		instance.pathRequestQueue.Enqueue(newRequest);
 		instance.TryProcessNext();
 	}
@@ -54,23 +61,23 @@ public class PathRequestManager : MonoBehaviour {
 	/// is finished and another one remains
 	/// </summary>
 	void TryProcessNext() {
-		if (!isProcessingPath && pathRequestQueue.Count > 0) {
+		//if (!isProcessingPath && pathRequestQueue.Count > 0)
+		if (numWorkingPaths < MAX_WORKING_PATHS && pathRequestQueue.Count > 0){
 			currentPathRequest = pathRequestQueue.Dequeue();
-			isProcessingPath = true;
+			numWorkingPaths ++;
 
 			switch(currentPathRequest.pathfindingType)
 			{
 				case "A*":
-				StartCoroutine(pathfinding.AStarPathfinding(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.lineOfSight));
+				StartCoroutine(pathfinding.AStarPathfinding(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.lineOfSight, currentPathRequest.callback, currentPathRequest.pathId));
 				break;
 				case "DepthFirst":
 				StartCoroutine(pathfinding.DepthFirstSearch(currentPathRequest.pathStart, currentPathRequest.pathEnd));
 				break;
 				case "IterativeDeepening":
-				StartCoroutine(pathfinding.IterativeDeepening(currentPathRequest.pathStart, currentPathRequest.pathEnd));
+				StartCoroutine(pathfinding.IterativeDeepening(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
 				break;
 			}
-			//pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.pathfindingType, currentPathRequest.lineOfSight);
 		}
 	}
 	#endregion
@@ -86,6 +93,13 @@ public class PathRequestManager : MonoBehaviour {
 		isProcessingPath = false;
 		TryProcessNext();
 	}
+
+	public void FinishedProcessingPath(GridPath foundPath) {
+		foundPath.callback(foundPath.path.waypoints, foundPath.path.pathSuccess);
+		enemysInQueue.Remove(foundPath.path.PathID);
+		numWorkingPaths --;
+		TryProcessNext();
+	}
 	#endregion
 
 	#region PathRequest (DataStructure)
@@ -95,13 +109,15 @@ public class PathRequestManager : MonoBehaviour {
 		public Vector3 pathEnd;
 		public Action<Vector3[], bool> callback;
 		public string pathfindingType;
+		public int pathId;
 		
-		public PathRequest(Vector3 _start, Vector3 _end, Action<Vector3[], bool> _callback, string _pathfindingType, bool _lineOfSight) {
+		public PathRequest(Vector3 _start, Vector3 _end, Action<Vector3[], bool> _callback, string _pathfindingType, bool _lineOfSight, int _pathId) {
 			pathStart = _start;
 			pathEnd = _end;
 			callback = _callback;
 			pathfindingType = _pathfindingType;
 			lineOfSight = _lineOfSight;
+			pathId = _pathId;
 		}
 	}
 	#endregion

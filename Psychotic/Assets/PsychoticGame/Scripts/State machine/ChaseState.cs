@@ -7,10 +7,13 @@ public class ChaseState : IEnemyState
 	private readonly StatePatternEnemy enemy;
 	private HorrorAI zombie;
 	private float searchTimer = 0f;
+	private Vector3 playerPos, zombiePos;
+
 
 
 	private Decision[] decisions = new Decision[5];
 	private TreeAction[] actions = new TreeAction[4];
+	private DecisionTree decisionTree;
 	
 	public ChaseState(StatePatternEnemy statePatternEnemy, HorrorAI zombie)
 	{
@@ -19,18 +22,15 @@ public class ChaseState : IEnemyState
 
 		MakeDecisionTree();
 		SetNodes();
+
+		decisionTree = new DecisionTree(decisions, actions, enemy.AddActionToQueue);
 	}
 
 	public void UpdateState()
 	{
-		Debug.Log("IN CHASE");
-		//Look();
+		playerPos = zombie.target.position;
+		zombiePos = zombie.transform.position;
 		Chase ();
-	}
-	
-	public void OnTriggerEnter(Collider other)
-	{
-		
 	}
 
 	public void MakeDecisionTree()
@@ -51,10 +51,9 @@ public class ChaseState : IEnemyState
 				return false;
 		});
 
-		//Less than 1 away from player?
+		//Less than 2 away from player?
 		decisions[2] = new Decision((object[] args) => {
-			Debug.Log("Distance:  " +Vector3.Distance(zombie.transform.position, zombie.target.position));
-			if(Vector3.Distance(zombie.transform.position, zombie.target.position) < 2)
+			if(Vector3.Distance(zombiePos, playerPos) < 2)
 				return true;
 			else
 				return false;
@@ -70,7 +69,7 @@ public class ChaseState : IEnemyState
 
 		//Is the enemy audible?
 		decisions[4] = new Decision((object[] args) => {
-			if(enemy.enemySight.PlayerAudible())
+			if(enemy.enemySight.PlayerAudible(zombiePos, playerPos))
 				return true;
 			else
 				return false;
@@ -95,7 +94,7 @@ public class ChaseState : IEnemyState
 		{
 			action = () => {searchTimer = 0f;},
 			targetState = "Chase",
-			animation = "Attack",
+			animation = "attack01",
 			pathFindingMethod = "A*"
 		};
 
@@ -103,7 +102,7 @@ public class ChaseState : IEnemyState
 		{
 			action = () => {
 				if(zombie.TargetReached)
-				zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
+					zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
 			},
 			targetState = "Chase",
 			animation = "None",
@@ -124,54 +123,15 @@ public class ChaseState : IEnemyState
 	{
 		searchTimer = 0f;
 		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
+		Debug.Log("Chase State Entered Calling for New Path");
+		zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", true);
 	}
 
-	public TreeAction GetStateAction()
+	public void GetStateAction()
 	{
-		return decisions[0].MakeDecision(decisions[0].GetBranch());
+		if(decisionTree.EventCompleted)
+			decisionTree.StartDecisionProcess();
 	}	
-
-	public void ToPatrolState()
-	{
-		
-	}
-
-	public void ToAlertState()
-	{
-		enemy.currentState = enemy.alertState;
-		zombie.speed = 0;
-	}
-	
-	public void ToChaseState()
-	{
-		Debug.Log("Can't transition to same state");
-	}
-
-	private void Look()
-	{
-		/*RaycastHit hit;
-		Vector3 enemyToTarget = (enemy.chaseTarget.position + enemy.offset) - enemy.eyes.transform.position;
-		Debug.DrawRay(enemy.eyes.transform.position, enemyToTarget, Color.red);
-
-		if(Physics.Raycast(enemy.eyes.transform.position, enemyToTarget, out hit, enemy.sightRange) && hit.collider.CompareTag("Player"))
-		{
-			enemy.chaseTarget = hit.transform;
-		}
-		else
-		{
-			ToAlertState();
-		}
-		*/
-		if (enemy.enemySight.playerInSight) 
-		{
-			enemy.chaseTarget = enemy.enemySight.targetLocation;
-		} 
-		else 
-		{
-			ToAlertState();
-		}
-
-	}
 
 	private void Chase()
 	{
@@ -180,8 +140,13 @@ public class ChaseState : IEnemyState
 
 		searchTimer += Time.deltaTime;
 
-		if(zombie.TargetReached && PathRequestManager.IsProcessingPath == false)
+		if(zombie.TargetReached && !PathRequestManager.IsInQueue(zombie.GetInstanceID()) && Vector3.Distance(zombiePos, playerPos) > 2)
+		{
+			Debug.Log("Zombie ID in chase" +zombie.GetInstanceID());
+
 			zombie.CallForNewPath(enemy.enemySight.targetLocation.position, enemy.pathfindingStrategy, true);
+			Debug.Log("Path Request From Chase State");
+		}
 
 	}
 
