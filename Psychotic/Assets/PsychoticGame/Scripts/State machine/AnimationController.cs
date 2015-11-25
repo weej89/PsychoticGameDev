@@ -7,9 +7,6 @@ public class AnimationController : MonoBehaviour
 	StatePatternEnemy state;
 	Animator anim;
 
-	int attack01Hash = Animator.StringToHash("Attack01");
-	int attack02Hash = Animator.StringToHash("Attack02");
-
 	// Use this for initialization
 	void Start () 
 	{
