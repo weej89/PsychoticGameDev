@@ -23,18 +23,25 @@ public class IDeepeningPath : GridPath
 		int depth = 0;
 		path.pathSuccess = false;
 		
-
-		while(!path.pathSuccess && visitedHash.Count < grid.MaxSize)
+		try
 		{
-			path.pathSuccess = Deepening(startNode, depth, visitedHash, targetNode);
+			while(!path.pathSuccess && visitedHash.Count < grid.MaxSize)
+			{
+				path.pathSuccess = Deepening(startNode, depth, visitedHash, targetNode);
 			
-			visitedHash.RemoveWhere(n => n.parent != null && n != startNode);
+				visitedHash.RemoveWhere(n => n.parent != null && n != startNode);
 			
-			depth++;
-		}
+				depth++;
+			}
 
-		if(path.pathSuccess)
-			path.waypoints = RetracePath(startNode, targetNode);
+			if(path.pathSuccess)
+				path.waypoints = RetracePath(startNode, targetNode);
+		}
+		catch(Exception ex)
+		{
+			Debug.Log("Error in find path method of IDeepening path");
+			path.pathSuccess = false;
+		}
 
 		doneEvent.Set();
 	}
@@ -43,32 +50,40 @@ public class IDeepeningPath : GridPath
 	{
 		bool targetFound = false;
 		Heap<Node> nodeHeap = new Heap<Node>(8);
-		
-		if(depth >= 0)
+
+		try
 		{
-			if(root == target)
+			if(depth >= 0)
 			{
-				return true;
-			}
-			else
-			{
-				foreach(Node n in grid.GetNeighbors(root))
+				if(root == target)
 				{
-					if(!visitedHash.Contains(n) && n.walkable)
+					return true;
+				}
+				else
+				{
+					foreach(Node n in grid.GetNeighbors(root))
 					{
-						n.hCost = GetDistance(n, target);
-						nodeHeap.Add(n);
-						visitedHash.Add(n);
+						if(!visitedHash.Contains(n) && n.walkable)
+						{
+							n.hCost = GetDistance(n, target);
+							nodeHeap.Add(n);
+							visitedHash.Add(n);
+						}
+					}
+				
+					while(nodeHeap.Count > 0 && targetFound == false)
+					{
+						Node node = nodeHeap.RemoveFirst();
+						node.parent = root;
+						targetFound = Deepening(node, depth-1, visitedHash, target);
 					}
 				}
-				
-				while(nodeHeap.Count > 0 && targetFound == false)
-				{
-					Node node = nodeHeap.RemoveFirst();
-					node.parent = root;
-					targetFound = Deepening(node, depth-1, visitedHash, target);
-				}
 			}
+		}
+		catch (Exception ex)
+		{
+			Debug.Log("Exception in Deepening method of IDeepening Path" +ex);
+			return false;
 		}
 		return targetFound;
 	}

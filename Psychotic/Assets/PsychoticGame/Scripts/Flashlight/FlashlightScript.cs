@@ -8,6 +8,7 @@ public class FlashlightScript : MonoBehaviour
 
 	#region Public Fields
 	public bool FlashlightOn;
+	public bool flashlightBatteryEnabled = false;
 
 	public float FlashlightBattery
 	{
@@ -45,7 +46,8 @@ public class FlashlightScript : MonoBehaviour
 		if (FlashlightOn && flashlightBattery > 0) 
 		{
 			flashLight.intensity = 1;
-			flashlightBattery -= .1f;
+			if(flashlightBatteryEnabled)
+				flashlightBattery -= .1f;
 		} 
 		else 
 		{
