@@ -74,7 +74,7 @@ public class PatrolState : IEnemyState
 		
 		actions[0] = new TreeAction()
 		{
-			pathFindingMethod = "A*",
+            pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
 			animation = "None"
 		};
@@ -82,29 +82,29 @@ public class PatrolState : IEnemyState
 		actions[1] = new TreeAction()
 		{
 			action = () => {GetPatrolPoint(enemy.avgPatrolInterval);},	
-			args = {}, 
-			pathFindingMethod = "A*", 
+			args = {},
+            pathFindingMethod = "DynamicBiDirectional", 
 			targetState = "Patrol", 
 			animation = "None"
 		};
 
 		actions[2] = new TreeAction()
 		{
-			pathFindingMethod = "IterativeDeepening",
+            pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
 			animation = "None"
 		};
 
 		actions[3] = new TreeAction()
 		{
-			pathFindingMethod = "A*",
+            pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Chase",
 			animation = "None"
 		};
 
 		actions[4] = new TreeAction()
 		{
-			pathFindingMethod = "IterativeDeepening",
+            pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
 			animation = "None"
 		};
@@ -115,7 +115,7 @@ public class PatrolState : IEnemyState
 				if(zombie.TargetReached)
 					zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
 			},
-			pathFindingMethod = "A*",
+            pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Alert",
 			animation = "None"
 		};

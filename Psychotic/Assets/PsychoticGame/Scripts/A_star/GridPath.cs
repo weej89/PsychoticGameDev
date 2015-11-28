@@ -19,6 +19,9 @@ public abstract class GridPath
 	public bool GetEventDone
 	{get{return doneEvent.WaitOne(0);}}
 
+    public Grid GetGridRef
+    { get { return grid; } }
+
 	public GridPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, Action<Vector3[], bool> _callback, int _pathId)
 	{
 		grid = _grid;
@@ -65,7 +68,7 @@ public abstract class GridPath
 	/// <returns>The distance.</returns>
 	/// <param name="nodeA">Node a.</param>
 	/// <param name="nodeB">Node b.</param>
-	protected virtual int GetDistance(Node nodeA, Node nodeB)
+	public virtual int GetDistance(Node nodeA, Node nodeB)
 	{
 		int distX = Mathf.Abs(nodeA.gridX - nodeB.gridX);
 		int distY = Mathf.Abs(nodeA.gridY - nodeB.gridY);

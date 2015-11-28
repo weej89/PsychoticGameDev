@@ -77,6 +77,9 @@ public class PathRequestManager : MonoBehaviour {
 				case "IterativeDeepening":
 				StartCoroutine(pathfinding.IterativeDeepening(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
 				break;
+                case "DynamicBiDirectional":
+                StartCoroutine(pathfinding.DynamicBiDirectional(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
+                break;
 			}
 		}
 	}

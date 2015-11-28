@@ -51,7 +51,7 @@ public class StatePatternEnemy : MonoBehaviour
 		alertState = new AlertState(this, enemy);
 		patrolState = new PatrolState(this, enemy, grid);
 
-		pathfindingStrategy = "A*";
+        pathfindingStrategy = "DynamicBiDirectional";
 
 		processedActions = new Queue<TreeAction>();
 	}

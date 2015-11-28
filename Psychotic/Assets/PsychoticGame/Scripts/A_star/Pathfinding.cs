@@ -54,7 +54,7 @@ public class Pathfinding : MonoBehaviour
 
 		yield return null;
 
-		UnityEngine.Debug.Log("Going into thread");
+		UnityEngine.Debug.Log("Going into A* Thread");
 		AStarPath aStar = new AStarPath(grid, meshCopy, startPos, targetPos, lineOfSight, callback, pathId);
 		paths.Add(aStar);
 		ThreadPool.QueueUserWorkItem(aStar.ThreadPoolCallback, paths.Count);
@@ -68,12 +68,23 @@ public class Pathfinding : MonoBehaviour
 		Node[,] meshCopy = grid.GetGridCopy();
 		
 		yield return null;
-		UnityEngine.Debug.Log("Going into thread");
+		UnityEngine.Debug.Log("Going into IterativeDeepening Thread");
 		IDeepeningPath iDeepening = new IDeepeningPath(grid, meshCopy, startPos, targetPos, callback, pathId);
 		paths.Add(iDeepening);
 		ThreadPool.QueueUserWorkItem(iDeepening.ThreadPoolCallback, paths.Count);
 	}
 	#endregion
+
+    public IEnumerator DynamicBiDirectional(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId)
+    {
+        Node[,] meshCopy = grid.GetGridCopy();
+
+        yield return null;
+        UnityEngine.Debug.Log("Going into DynamicBiDirectional Thread");
+        DynBiDirBeamPath dynPath = new DynBiDirBeamPath(grid, meshCopy, startPos, targetPos, callback, pathId);
+        paths.Add(dynPath);
+        ThreadPool.QueueUserWorkItem(dynPath.ThreadPoolCallback, paths.Count);
+    }
 
 	#region NewPathfinding
 	public IEnumerator DepthFirstSearch(Vector3 startPoint, Vector3 targetPos)
