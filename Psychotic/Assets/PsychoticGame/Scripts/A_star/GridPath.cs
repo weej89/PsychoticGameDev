@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.IO;
 
 public abstract class GridPath
 {
@@ -12,6 +13,10 @@ public abstract class GridPath
 	protected Vector3 targetPos;
 	protected ManualResetEvent doneEvent;
 	protected int pathId;
+    protected object threadHandle;
+
+    protected System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+    
 
 	public Action<Vector3[], bool> callback;
 	public Path path;
@@ -31,15 +36,24 @@ public abstract class GridPath
 		callback = _callback;
 
 		doneEvent = new ManualResetEvent(false);
-		path = new Path(_pathId);
+        path = new Path(_pathId);
 	}
 
 	public virtual void ThreadPoolCallback(System.Object threadContext)
 	{
+        threadHandle = threadContext;
 		FindPath();
 	}
 
 	public abstract void FindPath();
+
+    public virtual void WriteResults(float time, string pathType, int numExpanded, int numWaypoints)
+    {
+        string results = string.Empty;
+
+        results += ("Expanded: " + numExpanded + " Path Length: " + numWaypoints + " Path Type: " + pathType + " Time: " + time + "ms");
+        TestFileRecord.WriteToThatFile(results, threadHandle);
+    }
 
 	public virtual Vector3[] RetracePath(Node startNode, Node endNode)
 	{

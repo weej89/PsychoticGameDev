@@ -25,6 +25,7 @@ public class IDeepeningPath : GridPath
 		
 		try
 		{
+            stopWatch.Start();
 			while(!path.pathSuccess && visitedHash.Count < grid.MaxSize)
 			{
 				path.pathSuccess = Deepening(startNode, depth, visitedHash, targetNode);
@@ -42,6 +43,11 @@ public class IDeepeningPath : GridPath
 			Debug.Log("Error in find path method of IDeepening path");
 			path.pathSuccess = false;
 		}
+
+        stopWatch.Stop();
+
+        WriteResults(stopWatch.ElapsedMilliseconds, "Iterative Deepening", visitedHash.Count, path.waypoints.Length);
+
 
 		doneEvent.Set();
 	}

@@ -28,6 +28,8 @@ public class DynBiDirBeamPath : GridPath
     {
        DBDBOPAgent.PathFoundResponse responseFromAgent;
 
+       stopWatch.Start();
+
        while(path.pathSuccess == false)
        {
            responseFromAgent = toGoalAgent.DoSearch(fromGoalAgent.closedSet);
@@ -74,6 +76,10 @@ public class DynBiDirBeamPath : GridPath
            else if (responseFromAgent == DBDBOPAgent.PathFoundResponse.NOT_FOUND) //Not found giving up
                break;
        }
+
+       stopWatch.Stop();
+
+       WriteResults(stopWatch.ElapsedMilliseconds, "BDBOP", (toGoalAgent.closedSet.Count + toGoalAgent.openSet.Count + fromGoalAgent.closedSet.Count + fromGoalAgent.openSet.Count), path.waypoints.Length);
 
        doneEvent.Set();
     }

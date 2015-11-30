@@ -15,6 +15,8 @@ public class AStarPath : GridPath
 
 	public override void FindPath ()
 	{
+        stopWatch.Start();
+
 		bool pathSuccess = false;
 		
 		Node startNode = grid.NodeFromWorldPoint(meshCopy, startPos);
@@ -78,6 +80,10 @@ public class AStarPath : GridPath
 					}
 				}
 			}
+
+            stopWatch.Stop();
+            WriteResults(stopWatch.ElapsedMilliseconds, "A*", (openSet.Count + closedSet.Count), closedSet.Count);
+
 		}
 		}
 		catch(Exception ex)
@@ -85,10 +91,12 @@ public class AStarPath : GridPath
 			Debug.Log("Exception in A* pathfinding " +ex);
 		}
 
+
 		if(pathSuccess)
 			path.waypoints = RetracePath(startNode, targetNode);
 
 		path.pathSuccess = pathSuccess;
+
 		doneEvent.Set();
 	}
 }

@@ -80,6 +80,9 @@ public class PathRequestManager : MonoBehaviour {
                 case "DynamicBiDirectional":
                 StartCoroutine(pathfinding.DynamicBiDirectional(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
                 break;
+                case "Fringe":
+                StartCoroutine(pathfinding.FringeSearch (currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
+                break;
 			}
 		}
 	}

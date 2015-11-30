@@ -13,7 +13,7 @@ public class DBDBOPAgent
     //private HashSet<Node> oppositeAgentSet;
     private ManualResetEvent doneEvent;
     private int nodesToExpand;
-    private Heap<Node> openSet;
+    public Heap<Node> openSet;
 
     public AgentResult agentResult;
     public HashSet<Node> closedSet;

@@ -27,6 +27,8 @@ public class Pathfinding : MonoBehaviour
 	{
 		requestManager = GetComponent<PathRequestManager>();
 		grid=GetComponent<Grid>();
+
+        TestFileRecord.CreateFile("TestFile-" + DateTime.Now);
 	}
 	#endregion
 
@@ -84,6 +86,17 @@ public class Pathfinding : MonoBehaviour
         DynBiDirBeamPath dynPath = new DynBiDirBeamPath(grid, meshCopy, startPos, targetPos, callback, pathId);
         paths.Add(dynPath);
         ThreadPool.QueueUserWorkItem(dynPath.ThreadPoolCallback, paths.Count);
+    }
+
+    public IEnumerator FringeSearch(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId)
+    {
+        Node[,] meshCopy = grid.GetGridCopy();
+
+        yield return null;
+        UnityEngine.Debug.Log("Going into FringeSearch Thread");
+        FringeSearchPath fringePath = new FringeSearchPath(grid, meshCopy, startPos, targetPos, callback, pathId);
+        paths.Add(fringePath);
+        ThreadPool.QueueUserWorkItem(fringePath.ThreadPoolCallback, paths.Count);
     }
 
 	#region NewPathfinding
