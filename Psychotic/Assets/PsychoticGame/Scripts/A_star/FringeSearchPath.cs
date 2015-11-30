@@ -26,63 +26,79 @@ public class FringeSearchPath : GridPath
 				HashSet<Node> cache = new HashSet<Node>();
                 List<Node> nextList = new List<Node>();
 				List<Node> currList = new List<Node>();
-                cache.Add(startNode);
+
+                currList.Add(startNode);
 
 				int threshold = GetDistance(startNode, targetNode);
 
+                Debug.Log("Made it to first while loop");
 				while(!path.pathSuccess && (currList.Count > 0 || nextList.Count > 0))
 				{
                     int fMin = int.MaxValue;
-                    
+
                     while(currList.Count > 0)
                     {
+                        Debug.Log("Setting current node");
                         Node currentNode = currList[0];
+                        cache.Add(currentNode);
                         currList.RemoveAt(0);
+                        Debug.Log("Removing from current list and adding to cache");
 
                         if(currentNode.fCost > threshold)
                         {
+                            Debug.Log("Adding node to next list for later");
                             fMin = Math.Min(currentNode.fCost, fMin);
-                            nextList.Insert(nextList.Count - 1, currentNode);
+                            nextList.Add(currentNode);
                             continue;
                         }
 
-                        if(currentNode == targetNode)
+                        Debug.Log("Checking For End State");
+                        if(currentNode.gridX == targetNode.gridX && currentNode.gridY == targetNode.gridY)
                         {
+                            Debug.Log("End State Found");
                             path.pathSuccess = true;
                             break;
                         }
 
-                        foreach(Node neighbor in grid.GetNeighbors(meshCopy, currentNode))
+                        Debug.Log("Getting new neighbors");
+                        foreach (Node neighbor in grid.GetNeighbors(meshCopy, currentNode))
                         {
                             if (!neighbor.walkable || cache.Contains(neighbor))
+                            {
                                 continue;
+                            }
 
                             int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
 
-                            neighbor.gCost = newMovementCostToNeighbor;
-                            neighbor.hCost = GetDistance(neighbor, targetNode);
-                            neighbor.parent = currentNode;
-
-                            if (!currList.Contains(neighbor))
+                            if (!currList.Contains(neighbor) || newMovementCostToNeighbor < neighbor.gCost)
                             {
-                                currList.Insert(0, neighbor);
-                                cache.Add(neighbor);
+                                neighbor.gCost = newMovementCostToNeighbor;
+                                neighbor.hCost = GetDistance(neighbor, targetNode);
+                                neighbor.parent = currentNode;
+
+                                if (!currList.Contains(neighbor))
+                                {
+                                    currList.Add(neighbor);
+                                }
                             }
                         }
                     }
 
+                    Debug.Log("Setting current list to next list");
                     threshold = fMin;
                     List<Node> tmp = currList;
                     currList = nextList;
-                    nextList = tmp;
+                    nextList = new List<Node>();
 				}
 
                 stopWatch.Stop();
 
+                Debug.Log("Pathfinding Completed");
+
                 if (path.pathSuccess)
                     path.waypoints = RetracePath(startNode, targetNode);
 
-                //WriteResults(stopWatch.ElapsedMilliseconds, "FringeSearch", cache.Count, path.waypoints.Length);
+                WriteResults(stopWatch.ElapsedMilliseconds, "FringeSearch", cache.Count, path.waypoints.Length);
 			}
 		}
 		catch(Exception ex)

@@ -28,7 +28,7 @@ public class Pathfinding : MonoBehaviour
 		requestManager = GetComponent<PathRequestManager>();
 		grid=GetComponent<Grid>();
 
-        TestFileRecord.CreateFile("TestFile-" + DateTime.Now);
+        TestFileRecord.CreateFile(String.Format("{0:yyy-MM-dd}__{1}", DateTime.Now, "TestFile"));
 	}
 	#endregion
 

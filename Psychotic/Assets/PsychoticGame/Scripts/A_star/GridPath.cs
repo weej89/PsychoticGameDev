@@ -108,6 +108,7 @@ public class Path
 	public Path(int _pathId)
 	{
 		pathId = _pathId;
+        waypoints = new Vector3[0];
 	}
 
 	public Path(Vector3[] _waypoints, bool _pathSuccess, int _pathId)
