@@ -1,20 +1,27 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#endregion
 
 public class ChaseState : IEnemyState
 {
+	#region Private Variables
 	private readonly StatePatternEnemy enemy;
 	private HorrorAI zombie;
 	private float searchTimer = 0f;
 	private Vector3 playerPos, zombiePos;
-
-
-
 	private Decision[] decisions = new Decision[5];
 	private TreeAction[] actions = new TreeAction[4];
 	private DecisionTree decisionTree;
-	
+	#endregion
+
+	#region Constructor
+	/// <summary>
+	/// Initializes a new instance of the <see cref="ChaseState"/> class.
+	/// </summary>
+	/// <param name="statePatternEnemy">State pattern enemy.</param>
+	/// <param name="zombie">Zombie.</param>
 	public ChaseState(StatePatternEnemy statePatternEnemy, HorrorAI zombie)
 	{
 		this.enemy = statePatternEnemy;
@@ -25,14 +32,24 @@ public class ChaseState : IEnemyState
 
 		decisionTree = new DecisionTree(decisions, actions, enemy.AddActionToQueue);
 	}
+	#endregion
 
+	#region UpdateState
+	/// <summary>
+	/// Updates the state.
+	/// </summary>
 	public void UpdateState()
 	{
 		playerPos = zombie.target.position;
 		zombiePos = zombie.transform.position;
 		Chase ();
 	}
+	#endregion
 
+	#region MakeDecisionTree
+	/// <summary>
+	/// Makes the decision tree.
+	/// </summary>
 	public void MakeDecisionTree()
 	{
 		//Is enemy in sight?
@@ -109,7 +126,12 @@ public class ChaseState : IEnemyState
 			pathFindingMethod = "A*"
 		};
 	}
+	#endregion
 
+	#region SetNodes
+	/// <summary>
+	/// Sets the nodes in decision tree
+	/// </summary>
 	private void SetNodes()
 	{
 		decisions[0].SetNodes(decisions[1], decisions[2]);
@@ -118,21 +140,35 @@ public class ChaseState : IEnemyState
 		decisions[3].SetNodes(null, decisions[4]);
 		decisions[4].SetNodes(null, actions[3]);
 	}
+	#endregion
 
+	#region OnStateEnter
+	/// <summary>
+	/// Raises the state enter event.
+	/// </summary>
 	public void OnStateEnter()
 	{
 		searchTimer = 0f;
 		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
-		Debug.Log("Chase State Entered Calling for New Path");
-		zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", true);
+		zombie.CallForNewPath(enemy.enemySight.targetLocation.position, enemy.pathfindingStrategy, true);
 	}
+	#endregion
 
+	#region GetStateAction
+	/// <summary>
+	/// Gets the state action.
+	/// </summary>
 	public void GetStateAction()
 	{
 		if(decisionTree.EventCompleted)
 			decisionTree.StartDecisionProcess();
 	}	
+	#endregion
 
+	#region Chase
+	/// <summary>
+	/// Perform actions central to chase state
+	/// </summary>
 	private void Chase()
 	{
 		//Set chase target in pathfinding
@@ -142,16 +178,19 @@ public class ChaseState : IEnemyState
 
 		if(zombie.TargetReached && !PathRequestManager.IsInQueue(zombie.GetInstanceID()) && Vector3.Distance(zombiePos, playerPos) > 2)
 		{
-			Debug.Log("Zombie ID in chase" +zombie.GetInstanceID());
-
 			zombie.CallForNewPath(enemy.enemySight.targetLocation.position, enemy.pathfindingStrategy, true);
-			Debug.Log("Path Request From Chase State");
 		}
-
 	}
+	#endregion
 
+	#region GetString
+	/// <summary>
+	/// Returns string representation of this state
+	/// </summary>
+	/// <returns>The string.</returns>
 	public string GetString()
 	{
 		return "Chase";
 	}
+	#endregion
 }

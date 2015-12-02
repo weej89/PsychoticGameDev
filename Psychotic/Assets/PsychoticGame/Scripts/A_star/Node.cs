@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
+#endregion
 
 public class Node : IHeapItem<Node> {
 

@@ -1,14 +1,28 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#endregion
 
-public class TargetArea {
-
+public class TargetArea 
+{
+	#region Public Variables
 	public List<Node> nodeList;
-	Grid grid;
-	Vector3 center;
-	float radius;
+	#endregion
 
+	#region Private Variables
+	private Grid grid;
+	private Vector3 center;
+	private float radius;
+	#endregion
+
+	#region Constructor
+	/// <summary>
+	/// Initializes a new instance of the <see cref="TargetArea"/> class.
+	/// </summary>
+	/// <param name="_grid">_grid.</param>
+	/// <param name="_center">_center.</param>
+	/// <param name="_radius">_radius.</param>
 	public TargetArea(Grid _grid, Vector3 _center, float _radius)
 	{
 		center = _center;
@@ -18,7 +32,13 @@ public class TargetArea {
 		this.nodeList = new List<Node>();
 		CreatePossibleTargetList();
 	}
+	#endregion
 
+	#region AddNodeFromWorldPoint
+	/// <summary>
+	/// Adds the node from world point.
+	/// </summary>
+	/// <param name="worldPoint">World point.</param>
 	private void AddNodeFromWorldPoint(Vector3 worldPoint)
 	{
 		Node node = grid.NodeFromWorldPoint(worldPoint);
@@ -26,7 +46,13 @@ public class TargetArea {
 		if(node.walkable && nodeList.Contains(node) == false)
 			nodeList.Add(node);
 	}
+	#endregion
 
+	#region GenerateCheckingPath
+	/// <summary>
+	/// Generates the checking path.
+	/// </summary>
+	/// <returns>The checking path.</returns>
 	public Vector3 GenerateCheckingPath()
 	{
 		if(nodeList.Count > 0)
@@ -40,7 +66,12 @@ public class TargetArea {
 		else
 			return new Vector3(-1, -1, -1);
 	}
+	#endregion
 
+	#region CreatePossibleTargetList
+	/// <summary>
+	/// Creates the possible target list within a cirlce of nodes
+	/// </summary>
 	private void CreatePossibleTargetList()
 	{
 		for(float x = (center.x - radius); x <= center.x; x++)
@@ -60,4 +91,5 @@ public class TargetArea {
 			}
 		}
 	}
+	#endregion
 }

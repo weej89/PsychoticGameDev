@@ -6,23 +6,38 @@ using System.Threading;
 
 public class DBDBOPAgent
 {
+	#region Private Variables
     private Node[,] grid;
     private Node startNode;
     private Node targetNode;
     private DynBiDirBeamPath searchMaster;
-    //private HashSet<Node> oppositeAgentSet;
     private ManualResetEvent doneEvent;
     private int nodesToExpand;
+	#endregion
+
+	#region Public Variables
     public Heap<Node> openSet;
 
     public AgentResult agentResult;
     public HashSet<Node> closedSet;
     
     public enum PathFoundResponse{GOAL, OTHER_AGENT, NOT_FOUND, RETRY};
+	#endregion
 
+	#region Public Fields
     public bool EventCompleted
     { get { return doneEvent.WaitOne(0); } }
+	#endregion
 
+	#region Constructor
+	/// <summary>
+	/// Initializes a new instance of the <see cref="DBDBOPAgent"/> class.
+	/// </summary>
+	/// <param name="_searchMaster">_search master.</param>
+	/// <param name="_grid">_grid.</param>
+	/// <param name="_startNode">_start node.</param>
+	/// <param name="_targetNode">_target node.</param>
+	/// <param name="_nodesToExpand">_nodes to expand.</param>
     public DBDBOPAgent(DynBiDirBeamPath _searchMaster, Node[,] _grid, Node _startNode, Node _targetNode, int _nodesToExpand)
     {
         searchMaster = _searchMaster;
@@ -35,14 +50,14 @@ public class DBDBOPAgent
         agentResult = new AgentResult(false);
         doneEvent = new ManualResetEvent(false);
     }
-    
-    /*
-    public void SetOppositeAgentHash(ref HashSet<Node> oppositeSet)
-    {
-        oppositeAgentSet = oppositeSet;
-    }
-    */
+	#endregion
 
+	#region DoSearch
+	/// <summary>
+	/// Dos the search.
+	/// </summary>
+	/// <returns>A response object to what the search has found</returns>
+	/// <param name="oppositeAgentSet">Opposite agent set.</param>
     public PathFoundResponse DoSearch(HashSet<Node> oppositeAgentSet)
     {
         agentResult.pathFound = false;
@@ -97,7 +112,10 @@ public class DBDBOPAgent
             return PathFoundResponse.RETRY;
     }
 }
+#endregion
 
+#region Class AgentResult
+//Used for storing result of current search
 public class AgentResult
 {
     public bool pathFound;
@@ -111,3 +129,4 @@ public class AgentResult
         lastNodeInSet = null;
     }
 }
+#endregion

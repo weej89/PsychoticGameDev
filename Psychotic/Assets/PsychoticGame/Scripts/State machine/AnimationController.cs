@@ -1,28 +1,40 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
+#endregion
 
 public class AnimationController : MonoBehaviour 
 {
-	HorrorAI zombie;
-	StatePatternEnemy state;
-	Animator anim;
+	#region Private Variables
+	private HorrorAI zombie;
+	private StatePatternEnemy state;
+	private Animator anim;
+	#endregion
 
+	#region Start
 	// Use this for initialization
 	void Start () 
 	{
 		anim = GetComponent<Animator>();
 		zombie = GetComponent<HorrorAI>();
 		state = GetComponent<StatePatternEnemy>();
-
 	}
-	
+	#endregion
+
+	#region Update
 	// Update is called once per frame
 	void Update () 
 	{
 		float enemySpeed = zombie.speed;
 		anim.SetFloat("Speed", enemySpeed);		
 	}
+	#endregion
 
+	#region PerformTriggerAnimation
+	/// <summary>
+	/// Performs the trigger animation.
+	/// </summary>
+	/// <param name="animation">Animation.</param>
 	public void PerformTriggerAnimation(string animation)
 	{	
 		switch(animation)
@@ -35,4 +47,5 @@ public class AnimationController : MonoBehaviour
 			break;
 		}
 	}
+	#endregion
 }

@@ -175,11 +175,17 @@ public class HorrorAI : MonoBehaviour
 	}
 	#endregion
 
+	#region PerformRotation
+	/// <summary>
+	/// Performs a rotation on the transform given from the character
+	/// </summary>
+	/// <param name="trans">Trans.</param>
+	/// <param name="currentWaypoint">Current waypoint.</param>
 	public void PerformRotation(Transform trans, Vector3 currentWaypoint)
 	{
 		direction = (currentWaypoint - trans.position).normalized;
 		lookRotation = Quaternion.LookRotation (direction);
 		trans.rotation = Quaternion.Slerp (trans.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-
 	}
+	#endregion
 }

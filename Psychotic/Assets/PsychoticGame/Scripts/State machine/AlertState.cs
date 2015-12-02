@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#endregion
 
 public class AlertState : IEnemyState
 {
+	#region Private Variables
 	private readonly StatePatternEnemy enemy;
 	private float searchTimer = 0f;
 	private HorrorAI zombie;
@@ -13,7 +16,14 @@ public class AlertState : IEnemyState
 	private TreeAction[] actions = new TreeAction[4];
 
 	private DecisionTree decisionTree;
-	
+	#endregion
+
+	#region Constructor
+	/// <summary>
+	/// Initializes a new instance of the <see cref="AlertState"/> class.
+	/// </summary>
+	/// <param name="statePatternEnemy">State pattern enemy.</param>
+	/// <param name="zombie">Zombie.</param>
 	public AlertState(StatePatternEnemy statePatternEnemy, HorrorAI zombie)
 	{
 		this.enemy = statePatternEnemy;
@@ -24,20 +34,35 @@ public class AlertState : IEnemyState
 
 		decisionTree = new DecisionTree(decisions, actions, enemy.AddActionToQueue);
 	}
-	
+	#endregion
+
+	#region UpdateState
+	/// <summary>
+	/// Updates the state.
+	/// </summary>
 	public void UpdateState()
 	{
 		playerPos = zombie.target.position;
 		zombiePos = zombie.transform.position;
 		Search();
 	}
-	
+	#endregion
+
+	#region GetStateAction
+	/// <summary>
+	/// Gets the state action.
+	/// </summary>
 	public void GetStateAction()
 	{
 		if(decisionTree.EventCompleted)
 			decisionTree.StartDecisionProcess();
 	}
+	#endregion
 
+	#region MakeDecisionTree
+	/// <summary>
+	/// Makes the decision tree.
+	/// </summary>
 	public void MakeDecisionTree()
 	{
 		//Is the search timer up
@@ -114,7 +139,12 @@ public class AlertState : IEnemyState
 			}
 		};
 	}
+	#endregion
 
+	#region SetNodes
+	/// <summary>
+	/// Sets the nodes.
+	/// </summary>
 	private void SetNodes()
 	{
 		decisions[0].SetNodes(decisions[1], decisions[2]);
@@ -123,28 +153,38 @@ public class AlertState : IEnemyState
 		decisions[3].SetNodes(decisions[4], actions[2]);
 		decisions[4].SetNodes(null, actions[3]);
 	}
-	
+	#endregion
+
+	#region OnStateEnter
+	/// <summary>
+	/// Raises the state enter event.
+	/// </summary>
 	public void OnStateEnter()
 	{
 		searchTimer = 0f;
 	}
+	#endregion
 
+	#region Search
+	/// <summary>
+	/// Performs actions specific to the alert state
+	/// </summary>
 	private void Search()
 	{
-		//Add new pathfinding stuff
-		//Rotate enemy towards player
 		enemy.meshRendererFlag.material.color = Color.yellow;
 		
 		searchTimer += Time.deltaTime;
-		
-		/*
-		if(searchTimer >= enemy.searchingDuration)
-			ToPatrolState();
-			*/
 	}
-	
+	#endregion
+
+	#region GetString
+	/// <summary>
+	/// Returns string representation of this state
+	/// </summary>
+	/// <returns>The string.</returns>
 	public string GetString()
 	{
 		return "Alert";
 	}
+	#endregion
 }

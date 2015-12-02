@@ -21,6 +21,7 @@ public class PathRequestManager : MonoBehaviour {
 	bool isProcessingPath = false;
 	#endregion
 
+	#region Public Fields
 	public static bool IsProcessingPath
 	{
 		get{return instance.isProcessingPath;}
@@ -28,13 +29,16 @@ public class PathRequestManager : MonoBehaviour {
 
 	public static bool IsInQueue(int id)
 	{return enemysInQueue.Contains(id);}
+	#endregion
+
 	#region Awake
 	/// <summary>
 	/// Awake this instance.
 	/// Make a new instance of this class for
 	/// static method
 	/// </summary>
-	void Awake() {
+	void Awake() 
+	{
 		instance = this;
 		pathfinding = GetComponent<Pathfinding>();
 	}
@@ -42,12 +46,16 @@ public class PathRequestManager : MonoBehaviour {
 
 	#region RequestPath
 	/// <summary>
-	/// Static method to request a path from the PathRequest Instance
+	/// Requests a path from the manager and adds it to the queue
 	/// </summary>
 	/// <param name="pathStart">Path start.</param>
 	/// <param name="pathEnd">Path end.</param>
 	/// <param name="callback">Callback.</param>
-	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback, string pathType, bool lineOfSight, int id) {
+	/// <param name="pathType">Path type.</param>
+	/// <param name="lineOfSight">If set to <c>true</c> line of sight.</param>
+	/// <param name="id">Identifier to make sure that correct thread grabs it path</param>
+	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback, string pathType, bool lineOfSight, int id) 
+	{
 		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback, pathType, lineOfSight, id);
 		enemysInQueue.Add(id);
 		instance.pathRequestQueue.Enqueue(newRequest);
@@ -57,11 +65,13 @@ public class PathRequestManager : MonoBehaviour {
 
 	#region TryProcessNext
 	/// <summary>
-	/// Processes the next path request if the current one
-	/// is finished and another one remains
+	/// Tries to process the next path by checking the current
+	/// thread count and allowing another to be started if the count
+	/// is less than the max threads limit.  Coroutines are used here
+	/// to optimize timings for frame processing
 	/// </summary>
-	void TryProcessNext() {
-		//if (!isProcessingPath && pathRequestQueue.Count > 0)
+	void TryProcessNext() 
+	{
 		if (numWorkingPaths < MAX_WORKING_PATHS && pathRequestQueue.Count > 0){
 			currentPathRequest = pathRequestQueue.Dequeue();
 			numWorkingPaths ++;
@@ -109,7 +119,10 @@ public class PathRequestManager : MonoBehaviour {
 	#endregion
 
 	#region PathRequest (DataStructure)
-	struct PathRequest {
+	//This struct is used for passing path data back and forth between the
+	//PathManager and Pathfinding object
+	struct PathRequest 
+	{
 		public bool lineOfSight;
 		public Vector3 pathStart;
 		public Vector3 pathEnd;

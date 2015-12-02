@@ -107,6 +107,11 @@ public class Grid : MonoBehaviour {
 	#endregion
 
 	#region GetGridCopy
+	/// <summary>
+	/// Returns a copy of the 2d node array for use with threads so that they don't
+	/// interfere with the overall grid structure and cause race conditions during pathfinding
+	/// </summary>
+	/// <returns>The grid copy.</returns>
 	public Node[,] GetGridCopy()
 	{
 		Node[,] newGrid = new Node[gridSizeX,gridSizeY];
@@ -181,6 +186,14 @@ public class Grid : MonoBehaviour {
 	}
 	#endregion
 
+	#region DetermineMovementPenalty
+	/// <summary>
+	/// Used for weighting different areas of the graph
+	/// Will create a sort of heat map going outwards from unwalkable nodes
+	/// </summary>
+	/// <param name="seenNodes">Seen nodes.</param>
+	/// <param name="node">Node.</param>
+	/// <param name="penalty">Penalty.</param>
 	public void DetermineMovementPenalty(HashSet<Node> seenNodes, Node node, int penalty)
 	{
 		if(penalty > 0)
@@ -195,6 +208,7 @@ public class Grid : MonoBehaviour {
 			}
 		}
 	}
+	#endregion
 
 	#region NodeFromWorldPoint
 	/// <summary>

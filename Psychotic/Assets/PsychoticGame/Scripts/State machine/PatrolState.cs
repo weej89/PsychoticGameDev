@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿#region Using
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#endregion
 
 public class PatrolState : IEnemyState
 {
+	#region Private Variables
 	private readonly StatePatternEnemy enemy;
 	private HorrorAI zombie;
 	private double patrolTime;
@@ -15,9 +18,19 @@ public class PatrolState : IEnemyState
 	private Decision[] decisions = new Decision[5];
 	private TreeAction[] actions = new TreeAction[6];
 	private DecisionTree decisionTree;
+	#endregion
 
+	#region Public Variables
 	public TargetArea targetArea;
+	#endregion
 
+	#region Constructor
+	/// <summary>
+	/// Initializes a new instance of the <see cref="PatrolState"/> class.
+	/// </summary>
+	/// <param name="statePatternEnemy">State pattern enemy.</param>
+	/// <param name="zombie">Zombie.</param>
+	/// <param name="grid">Grid.</param>
 	public PatrolState(StatePatternEnemy statePatternEnemy, HorrorAI zombie, Grid grid)
 	{
 		this.enemy = statePatternEnemy;
@@ -29,7 +42,12 @@ public class PatrolState : IEnemyState
 
 		decisionTree = new DecisionTree(decisions, actions, enemy.AddActionToQueue);
 	}
+	#endregion
 
+	#region MakeDecisionTree
+	/// <summary>
+	/// Makes the decision tree.
+	/// </summary>
 	public void MakeDecisionTree()
 	{
 		//Is the distance from enemy to player < 50 meters?
@@ -120,7 +138,12 @@ public class PatrolState : IEnemyState
 			animation = "None"
 		};
 	}
+	#endregion
 
+	#region SetNodes
+	/// <summary>
+	/// Sets the nodes for each decision in tree
+	/// </summary>
 	public void SetNodes()
 	{
 		decisions[0].SetNodes(decisions[1], decisions[2]);
@@ -128,9 +151,13 @@ public class PatrolState : IEnemyState
 		decisions[2].SetNodes(actions[2], decisions[3]);
 		decisions[3].SetNodes(decisions[4], actions[3]);
 		decisions[4].SetNodes(actions[4], actions[5]);
-	
 	}
+	#endregion
 
+	#region UpdateState
+	/// <summary>
+	/// Updates the state.
+	/// </summary>
 	public void UpdateState()
 	{
 		playerPos = zombie.target.position;
@@ -138,46 +165,71 @@ public class PatrolState : IEnemyState
 
 		Patrol();
 	}
+	#endregion
 
+	#region OnStateEnter
+	/// <summary>
+	/// Raises the state enter event.
+	/// </summary>
 	public void OnStateEnter()
 	{
 		GetPatrolPoint(enemy.avgPatrolInterval);
 		zombie.speed = zombie.DEFAULT_WALKING_SPEED;
 	}
+	#endregion
 
+	#region GetStateAction
+	/// <summary>
+	/// Gets the state action.
+	/// </summary>
 	public void GetStateAction()
 	{
 		if(decisionTree.EventCompleted)
 			decisionTree.StartDecisionProcess();
 	}	
+	#endregion
 
+	#region GetPatrolPoint
+	/// <summary>
+	/// Gets the new patrol point.
+	/// </summary>
+	/// <param name="avgInterval">Avg interval.</param>
 	public void GetPatrolPoint(double avgInterval)
 	{
 		patrolTime = GetNextRandomInterval(avgInterval) * avgInterval;
 		targetArea = new TargetArea(grid, zombie.target.position, enemy.targetAreaRadius);
 		currentTime = 0;
 	}
+	#endregion
 
+	#region Patrol
+	/// <summary>
+	/// Performs the actions specific to patrolling state
+	/// </summary>
 	void Patrol()
 	{
+		//Used for keeping track of state
 		enemy.meshRendererFlag.material.color = Color.green;
 
+		//If the current target has been reached and patrol time for this current location hasn't ended and AI isn't waiting for path processing
 		if(zombie.TargetReached && currentTime < patrolTime && !PathRequestManager.IsInQueue(zombie.GetInstanceID()))
 		{
+			//Call for a new path from checking area
 			Vector3 target = targetArea.GenerateCheckingPath();
-			Debug.Log("Zombie ID in patrol" +zombie.GetInstanceID());
 					
 			zombie.CallForNewPath(target, enemy.pathfindingStrategy, false);
-			Debug.Log("Path Request From Patrol State");
 
 		}
+		//Else generate a new checking area
 		else if (currentTime > patrolTime)
 		{
 			GetPatrolPoint(enemy.avgPatrolInterval);
 		}
-		
+
+		//Increment the current time for checking area expiration
 		currentTime += Time.deltaTime;
 	}
+	#endregion
 
 	#region GetNextRandomInterval
 	/// <summary>
@@ -194,8 +246,14 @@ public class PatrolState : IEnemyState
 	}
 	#endregion
 
+	#region GetString
+	/// <summary>
+	/// Gets the current states string representation
+	/// </summary>
+	/// <returns>The string.</returns>
 	public string GetString()
 	{
 		return "Patrol";
 	}
+	#endregion
 }
