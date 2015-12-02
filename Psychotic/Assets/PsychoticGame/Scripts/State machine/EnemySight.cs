@@ -8,13 +8,16 @@ public class EnemySight : MonoBehaviour
 	public float sightRange = 35f;
 	public Vector3 offset = new Vector3 (0, .5f, 0);
 	public Transform eyes;
-
+	
 	[HideInInspector] public Transform targetLocation;
 	[HideInInspector] public bool playerInSight;
 	[HideInInspector] public bool playerInCollider;
 	[HideInInspector] public float playerLastSeenTime;
+	[HideInInspector] public Vector3 playerLastHearLocation;
+	[HideInInspector] public bool playerAudible = false;
 
 	private SphereCollider col;
+	private HorrorAI ai;
 	private float timeSinceAudibleCheck = 0;
 	private const int AUDIBLE_COOLDOWN = 4000;
 
@@ -22,6 +25,7 @@ public class EnemySight : MonoBehaviour
 	void Start () 
 	{
 		col = GetComponent<SphereCollider>();
+		ai = GetComponent<HorrorAI>();
 	}
 	
 	// Update is called once per frame
@@ -29,6 +33,7 @@ public class EnemySight : MonoBehaviour
 	{
 		timeSinceAudibleCheck+=Time.deltaTime;
 		playerLastSeenTime += Time.deltaTime;
+
 	}
 
 	void OnTriggerStay (Collider other)
@@ -63,15 +68,21 @@ public class EnemySight : MonoBehaviour
 
 						playerLastSeenTime = 0;
 						// Set the last global sighting is the players current position.
+						return;
 					}
 				}
+			}
+
+			if(timeSinceAudibleCheck < AUDIBLE_COOLDOWN)
+			{
+				playerAudible = PlayerAudible(ai.transform.position, ai.target.position);
 			}
 		}
 	}
 
 	public bool PlayerAudible(Vector3 position, Vector3 targetPosition)
 	{
-		if(!playerInCollider || PathRequestManager.IsInQueue(GetInstanceID()) || timeSinceAudibleCheck < AUDIBLE_COOLDOWN)
+		if(!playerInCollider || PathRequestManager.IsInQueue(GetInstanceID()))
 			return false;
 		else
 		{
@@ -89,7 +100,10 @@ public class EnemySight : MonoBehaviour
 			timeSinceAudibleCheck = 0;
 
 			if(totalDistance < col.radius)
+			{
+				playerLastHearLocation = targetPosition;
 				return true;
+			}
 			else
 				return false;
 		}

@@ -84,7 +84,7 @@ public class PatrolState : IEnemyState
 
 		//Is the player audible?
 		decisions[4] = (new Decision((object[]args) => {
-			if(enemy.enemySight.PlayerAudible(zombiePos, playerPos))
+			if(enemy.enemySight.playerAudible)
 				return true;
 			else
 				return false;
@@ -92,7 +92,7 @@ public class PatrolState : IEnemyState
 		
 		actions[0] = new TreeAction()
 		{
-            pathFindingMethod = "Fringe",
+			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
 			animation = "None"
 		};
@@ -101,28 +101,28 @@ public class PatrolState : IEnemyState
 		{
 			action = () => {GetPatrolPoint(enemy.avgPatrolInterval);},	
 			args = {},
-            pathFindingMethod = "Fringe", 
+			pathFindingMethod = "DynamicBiDirectional", 
 			targetState = "Patrol", 
 			animation = "None"
 		};
 
 		actions[2] = new TreeAction()
 		{
-            pathFindingMethod = "Fringe",
+			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
 			animation = "None"
 		};
 
 		actions[3] = new TreeAction()
 		{
-            pathFindingMethod = "Fringe",
+			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Chase",
 			animation = "None"
 		};
 
 		actions[4] = new TreeAction()
 		{
-            pathFindingMethod = "Fringe",
+			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
 			animation = "None"
 		};
@@ -131,9 +131,9 @@ public class PatrolState : IEnemyState
 		{
 			action = () => {
 				if(zombie.TargetReached)
-					zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
+				zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "DynamicBiDirectional", false );
 			},
-            pathFindingMethod = "Fringe",
+			pathFindingMethod = "A*",
 			targetState = "Alert",
 			animation = "None"
 		};

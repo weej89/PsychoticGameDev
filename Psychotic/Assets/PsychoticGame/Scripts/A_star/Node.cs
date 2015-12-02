@@ -79,4 +79,19 @@ public class Node : IHeapItem<Node> {
 		return -compare;
 	}
 	#endregion
+
+	public override int GetHashCode ()
+	{
+		return base.GetHashCode ();
+	}
+
+	public override bool Equals (object obj)
+	{
+		Node nodeToCompare = (Node)obj;
+
+		if(this.gridX == nodeToCompare.gridX && this.gridY == nodeToCompare.gridY)
+			return true;
+		else
+			return false;
+	}
 }

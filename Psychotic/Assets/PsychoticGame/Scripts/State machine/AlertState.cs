@@ -99,7 +99,7 @@ public class AlertState : IEnemyState
 		
 		//Is the Player Audible?
 		decisions[4] = new Decision((object[] args) => {
-			if(enemy.enemySight.PlayerAudible(zombiePos, playerPos))
+			if(enemy.enemySight.playerAudible)
 				return true;
 			else
 				return false;

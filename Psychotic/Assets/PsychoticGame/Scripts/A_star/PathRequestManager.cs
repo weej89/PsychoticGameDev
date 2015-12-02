@@ -8,7 +8,7 @@ using System.Collections;
 public class PathRequestManager : MonoBehaviour {
 
 	#region Private Variables
-	const int MAX_WORKING_PATHS = 4;
+	public int MAX_WORKING_PATHS = 4;
 
 	Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
 	PathRequest currentPathRequest;

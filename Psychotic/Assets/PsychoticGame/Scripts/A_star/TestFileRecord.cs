@@ -29,6 +29,7 @@ public static class TestFileRecord
         {
             Debug.Log("File Already Exists.");
             testFile = new StreamWriter(fileName);
+			testFile.WriteLine("Starting new RUN");
         }
 		//Otherwise create the file and open it
         else
@@ -52,7 +53,7 @@ public static class TestFileRecord
     {
         lock(lockObj)
         {
-            testFile = new StreamWriter(fileName);
+            testFile = File.AppendText(fileName);
             testFile.WriteLine(entryNum + ". - " +text);
             entryNum++;
             testFile.Close();
