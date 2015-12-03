@@ -15,11 +15,13 @@ public class EnemySight : MonoBehaviour
 	[HideInInspector] public float playerLastSeenTime;
 	[HideInInspector] public Vector3 playerLastHearLocation;
 	[HideInInspector] public bool playerAudible = false;
+	[HideInInspector]public bool objectInFront = false;
 
 	private SphereCollider col;
 	private HorrorAI ai;
 	private float timeSinceAudibleCheck = 0;
 	private const int AUDIBLE_COOLDOWN = 4000;
+	private float objectRange = 2.0f;
 
 	// Use this for initialization
 	void Start () 
@@ -38,6 +40,8 @@ public class EnemySight : MonoBehaviour
 
 	void OnTriggerStay (Collider other)
 	{
+		objectInFront = CheckForObjectInPath(other);
+
 		// If the player has entered the trigger sphere...
 		if(other.gameObject.CompareTag("Player"))
 		{
@@ -116,5 +120,22 @@ public class EnemySight : MonoBehaviour
 			playerInCollider = false;
 			playerInSight = false;
 		}
+	}
+
+	bool CheckForObjectInPath(Collider obj)
+	{
+		if(obj.CompareTag("Door"))
+		{
+			Vector3 direction = obj.transform.position - transform.position;
+
+			RaycastHit hit;
+
+			if(Physics.Raycast(transform.position + transform.up, direction - transform.up, out hit, objectRange))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

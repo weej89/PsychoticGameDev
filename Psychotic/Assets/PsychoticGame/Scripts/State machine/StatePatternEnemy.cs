@@ -60,7 +60,7 @@ public class StatePatternEnemy : MonoBehaviour
 		alertState = new AlertState(this, enemy);
 		patrolState = new PatrolState(this, enemy, grid);
 
-		pathfindingStrategy = "Fringe";
+		pathfindingStrategy = "A*";
 
 		processedActions = new Queue<TreeAction>();
 	}

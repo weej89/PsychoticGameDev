@@ -15,8 +15,8 @@ public class PatrolState : IEnemyState
 
 	private Vector3 playerPos, zombiePos;
 
-	private Decision[] decisions = new Decision[5];
-	private TreeAction[] actions = new TreeAction[6];
+	private Decision[] decisions = new Decision[6];
+	private TreeAction[] actions = new TreeAction[7];
 	private DecisionTree decisionTree;
 	#endregion
 
@@ -50,8 +50,15 @@ public class PatrolState : IEnemyState
 	/// </summary>
 	public void MakeDecisionTree()
 	{
+		//Is there an object in front of me?
+		decisions[0] = (new Decision((object[] args) => {
+			if(enemy.enemySight.objectInFront)
+				return true;
+			else
+				return false;
+		}));
 		//Is the distance from enemy to player < 50 meters?
-		decisions[0] = (new Decision((object[]args) => {
+		decisions[1] = (new Decision((object[]args) => {
 			 if(Vector3.Distance(zombiePos, playerPos) < 50)
 				return true;
 			else
@@ -59,7 +66,7 @@ public class PatrolState : IEnemyState
 		}));
 
 		//Was the player last seen >  30 secs ago?
-		decisions[1] = (new Decision((object[]args) => {
+		decisions[2] = (new Decision((object[]args) => {
 			if(enemy.enemySight.playerLastSeenTime > 30)
 				return true;
 			else
@@ -67,7 +74,7 @@ public class PatrolState : IEnemyState
 		}));
 
 		//Is the player in the collider?
-		decisions[2] = (new Decision((object[]args) => {
+		decisions[3] = (new Decision((object[]args) => {
 			if(enemy.enemySight.playerInCollider)
 				return true;
 			else
@@ -75,7 +82,7 @@ public class PatrolState : IEnemyState
 		}));
 
 		//Is the Player visible?
-		decisions[3] = (new Decision((object[]args) => {
+		decisions[4] = (new Decision((object[]args) => {
 			if(enemy.enemySight.playerInSight)
 				return true;
 			else
@@ -83,21 +90,28 @@ public class PatrolState : IEnemyState
 		}));
 
 		//Is the player audible?
-		decisions[4] = (new Decision((object[]args) => {
+		decisions[5] = (new Decision((object[]args) => {
 			if(enemy.enemySight.playerAudible)
 				return true;
 			else
 				return false;
 		}));
-		
+
 		actions[0] = new TreeAction()
+		{
+			pathFindingMethod = "DynamicBiDirectional",
+			targetState = "Patrol",
+			animation = "attack02"
+		};
+
+		actions[1] = new TreeAction()
 		{
 			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
 			animation = "None"
 		};
 
-		actions[1] = new TreeAction()
+		actions[2] = new TreeAction()
 		{
 			action = () => {GetPatrolPoint(enemy.avgPatrolInterval);},	
 			args = {},
@@ -106,28 +120,28 @@ public class PatrolState : IEnemyState
 			animation = "None"
 		};
 
-		actions[2] = new TreeAction()
-		{
-			pathFindingMethod = "DynamicBiDirectional",
-			targetState = "Patrol",
-			animation = "None"
-		};
-
 		actions[3] = new TreeAction()
 		{
 			pathFindingMethod = "DynamicBiDirectional",
-			targetState = "Chase",
+			targetState = "Patrol",
 			animation = "None"
 		};
 
 		actions[4] = new TreeAction()
 		{
 			pathFindingMethod = "DynamicBiDirectional",
-			targetState = "Patrol",
+			targetState = "Chase",
 			animation = "None"
 		};
 
 		actions[5] = new TreeAction()
+		{
+			pathFindingMethod = "DynamicBiDirectional",
+			targetState = "Patrol",
+			animation = "None"
+		};
+
+		actions[6] = new TreeAction()
 		{
 			action = () => {
 				if(zombie.TargetReached)
@@ -146,11 +160,12 @@ public class PatrolState : IEnemyState
 	/// </summary>
 	public void SetNodes()
 	{
-		decisions[0].SetNodes(decisions[1], decisions[2]);
-		decisions[1].SetNodes(actions[0], actions[1]);
-		decisions[2].SetNodes(actions[2], decisions[3]);
-		decisions[3].SetNodes(decisions[4], actions[3]);
-		decisions[4].SetNodes(actions[4], actions[5]);
+		decisions[0].SetNodes(decisions[1], actions[0]);
+		decisions[1].SetNodes(decisions[2], decisions[3]);
+		decisions[2].SetNodes(actions[1], actions[0]);
+		decisions[3].SetNodes(actions[3], decisions[4]);
+		decisions[4].SetNodes(decisions[5], actions[4]);
+		decisions[5].SetNodes(actions[5], actions[6]);
 	}
 	#endregion
 
