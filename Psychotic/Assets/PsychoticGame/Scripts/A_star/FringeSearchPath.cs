@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 public class FringeSearchPath : GridPath
 {
+
 	#region Constructor
 	/// <summary>
 	/// Initializes a new instance of the <see cref="FringeSearchPath"/> class.
