@@ -162,7 +162,7 @@ public class PatrolState : IEnemyState
 	{
 		decisions[0].SetNodes(decisions[1], actions[0]);
 		decisions[1].SetNodes(decisions[2], decisions[3]);
-		decisions[2].SetNodes(actions[1], actions[0]);
+		decisions[2].SetNodes(actions[2], actions[1]);
 		decisions[3].SetNodes(actions[3], decisions[4]);
 		decisions[4].SetNodes(decisions[5], actions[4]);
 		decisions[5].SetNodes(actions[5], actions[6]);

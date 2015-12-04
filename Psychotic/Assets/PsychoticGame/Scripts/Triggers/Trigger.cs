@@ -84,7 +84,8 @@ public class Trigger : MonoBehaviour
 			enemy = GameObject.FindGameObjectsWithTag(TagRef);
 		}
 
-		Sound.loop = LoopSound;
+		if(Sound != null)
+			Sound.loop = LoopSound;
 	}
 
 	private void SetTriggerActive(bool playSound, bool setActiveObjects)

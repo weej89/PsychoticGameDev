@@ -7,7 +7,6 @@ public class AnimationController : MonoBehaviour
 {
 	#region Private Variables
 	private HorrorAI zombie;
-	private StatePatternEnemy state;
 	private Animator anim;
 	#endregion
 
@@ -17,7 +16,6 @@ public class AnimationController : MonoBehaviour
 	{
 		anim = GetComponent<Animator>();
 		zombie = GetComponent<HorrorAI>();
-		state = GetComponent<StatePatternEnemy>();
 	}
 	#endregion
 
@@ -44,6 +42,10 @@ public class AnimationController : MonoBehaviour
 			break;
 			case "attack02":
 			anim.SetTrigger("Attack02");
+			break;
+			case "None":
+			anim.ResetTrigger("Attack01");
+			anim.ResetTrigger("Attack02");
 			break;
 		}
 	}

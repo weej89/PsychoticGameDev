@@ -174,6 +174,9 @@ public class AlertState : IEnemyState
 		enemy.meshRendererFlag.material.color = Color.yellow;
 		
 		searchTimer += Time.deltaTime;
+
+		if(zombie.TargetReached)
+			zombie.speed = 0;
 	}
 	#endregion
 

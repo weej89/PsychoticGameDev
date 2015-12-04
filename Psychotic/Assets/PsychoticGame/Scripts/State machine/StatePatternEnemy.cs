@@ -11,17 +11,18 @@ public class StatePatternEnemy : MonoBehaviour
 	#region Public Variables
 	public float searchingTurnSpeed = 120f;
 	public float searchingDuration = 4f;
-	public float sightRange = 20f;
 	public double avgPatrolInterval = 15;
 	public Transform[] wayPoints;
-	public Transform eyes;
 	public Vector3 offset = new Vector3 (0, .5f, 0);
 	public MeshRenderer meshRendererFlag;
 	public TargetArea targetArea;
 	public float targetAreaRadius = 50f;
 	public Transform seeker;
 
-	public GameObject pathFinding;
+	public float STAND_STILL = 0f;
+	public float SLOW_WALK = 2.0f;
+	public float NORMAL_WALK = 3.0f;
+	public float RUNNING = 4.0f;
 	#endregion
 
 	#region Public Hidden Variables
@@ -39,10 +40,10 @@ public class StatePatternEnemy : MonoBehaviour
 	#region Private Variables
 	private HorrorAI enemy;
 	private Grid grid;
-	private bool playingTriggerAnimation = false;
 	private float decisionTime = 0;
 	private const float DECISION_COOLDOWN = .1f;
 	private Queue<TreeAction> processedActions;
+	private GameObject pathFinding;
 	#endregion
 
 	#region Awake

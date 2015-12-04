@@ -13,6 +13,7 @@ public class TreeAction : DecisionTreeNode
 	public string animation;
 	public int priority;
 	public string targetState;
+	public float speed;
 
 	public object[] args;
 
