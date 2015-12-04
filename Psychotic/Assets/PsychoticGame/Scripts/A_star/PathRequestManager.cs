@@ -62,7 +62,7 @@ public class PathRequestManager : MonoBehaviour {
 		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback, pathType, lineOfSight, id);
 		enemysInQueue.Add(id);
 		instance.pathRequestQueue.Enqueue(newRequest);
-		newRequest.sw.Start();
+		newRequest.sw = Stopwatch.StartNew();
 		instance.TryProcessNext();
 	}
 	#endregion

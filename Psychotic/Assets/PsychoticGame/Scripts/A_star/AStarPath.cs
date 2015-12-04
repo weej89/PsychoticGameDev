@@ -42,7 +42,7 @@ public class AStarPath : GridPath
 	public override void FindPath ()
 	{
 		//Starts the stopwatch timer for testing
-        stopWatch.Start();
+        stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
 		bool pathSuccess = false;
 		

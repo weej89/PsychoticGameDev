@@ -44,7 +44,7 @@ public class IDeepeningPath : GridPath
 		try
 		{
 			//Starts the stopwatch for timing the algorithm
-            stopWatch.Start();
+			stopWatch = System.Diagnostics.Stopwatch.StartNew();
 			while(!path.pathSuccess && visitedHash.Count < grid.MaxSize)
 			{
 				path.pathSuccess = Deepening(startNode, depth, visitedHash, targetNode);

@@ -47,7 +47,7 @@ public class DynBiDirBeamPath : GridPath
     	DBDBOPAgent.PathFoundResponse responseFromAgent;
 
 		//Starts the stopwatch
-      	stopWatch.Start();
+		stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
        	while(path.pathSuccess == false)
        	{
