@@ -1,0 +1,2 @@
+0. - Expanded: 999 Path Length: 231 Path Type: A* Path Time: 10ms  Total Time: 0 Straight Line Dist: 137.0228
+1. - Expanded: 712 Path Length: 206 Path Type: A* Path Time: 10ms  Total Time: 0 Straight Line Dist: 104.7306
