@@ -16,6 +16,8 @@ public class Pathfinding : MonoBehaviour
 
 	private List<Node> checkedNodes = new List<Node>();
 	private List<Node> usedNodes = new List<Node>();
+
+
 	#endregion
 
 	#region Awake
@@ -65,7 +67,7 @@ public class Pathfinding : MonoBehaviour
 	/// <param name="lineOfSight">If set to <c>true</c> line of sight.</param>
 	/// <param name="callback">Callback.</param>
 	/// <param name="pathId">Path identifier.</param>
-	public IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos, bool lineOfSight, Action<Vector3[], bool> callback, int pathId)
+	public IEnumerator AStarPathfinding(Vector3 startPos, Vector3 targetPos, bool lineOfSight, Action<Vector3[], bool> callback, int pathId, float totalMs)
 	{
 		//Added for mesh copy O(n2) heavy
 		Node[,] meshCopy = grid.GetGridCopy();
@@ -74,7 +76,7 @@ public class Pathfinding : MonoBehaviour
 		yield return null;
 		
 		UnityEngine.Debug.Log("Going into A* Thread");
-		AStarPath aStar = new AStarPath(grid, meshCopy, startPos, targetPos, lineOfSight, callback, pathId);
+		AStarPath aStar = new AStarPath(grid, meshCopy, startPos, targetPos, lineOfSight, callback, pathId, totalMs);
 		paths.Add(aStar);
 
 		//Starts a new thread using threadpool management
@@ -91,7 +93,7 @@ public class Pathfinding : MonoBehaviour
 	/// <param name="targetPos">Target position.</param>
 	/// <param name="callback">Callback.</param>
 	/// <param name="pathId">Path identifier.</param>
-	public IEnumerator IterativeDeepening(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId)
+	public IEnumerator IterativeDeepening(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId, float totalMs)
 	{
 		//Added for mesh copy O(n2) heavy
 		Node[,] meshCopy = grid.GetGridCopy();
@@ -100,7 +102,7 @@ public class Pathfinding : MonoBehaviour
 		yield return null;
 
 		UnityEngine.Debug.Log("Going into IterativeDeepening Thread");
-		IDeepeningPath iDeepening = new IDeepeningPath(grid, meshCopy, startPos, targetPos, callback, pathId);
+		IDeepeningPath iDeepening = new IDeepeningPath(grid, meshCopy, startPos, targetPos, callback, pathId, totalMs);
 		paths.Add(iDeepening);
 
 		//Starts a new thread using threadpool management
@@ -117,7 +119,7 @@ public class Pathfinding : MonoBehaviour
 	/// <param name="targetPos">Target position.</param>
 	/// <param name="callback">Callback.</param>
 	/// <param name="pathId">Path identifier.</param>
-    public IEnumerator DynamicBiDirectional(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId)
+    public IEnumerator DynamicBiDirectional(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId, float totalMs)
     {
 		//Added for mesh copy O(n2) heavy
         Node[,] meshCopy = grid.GetGridCopy();
@@ -126,7 +128,7 @@ public class Pathfinding : MonoBehaviour
         yield return null;
 
         UnityEngine.Debug.Log("Going into DynamicBiDirectional Thread");
-        DynBiDirBeamPath dynPath = new DynBiDirBeamPath(grid, meshCopy, startPos, targetPos, callback, pathId);
+        DynBiDirBeamPath dynPath = new DynBiDirBeamPath(grid, meshCopy, startPos, targetPos, callback, pathId, totalMs);
         paths.Add(dynPath);
 
 		//Starts a new thread using threadpool management
@@ -143,13 +145,13 @@ public class Pathfinding : MonoBehaviour
 	/// <param name="targetPos">Target position.</param>
 	/// <param name="callback">Callback.</param>
 	/// <param name="pathId">Path identifier.</param>
-    public IEnumerator FringeSearch(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId)
+    public IEnumerator FringeSearch(Vector3 startPos, Vector3 targetPos, Action<Vector3[], bool> callback, int pathId, float totalMs)
     {
         Node[,] meshCopy = grid.GetGridCopy();
 
         yield return null;
         UnityEngine.Debug.Log("Going into FringeSearch Thread");
-        FringeSearchPath fringePath = new FringeSearchPath(grid, meshCopy, startPos, targetPos, callback, pathId);
+        FringeSearchPath fringePath = new FringeSearchPath(grid, meshCopy, startPos, targetPos, callback, pathId, totalMs);
         paths.Add(fringePath);
         ThreadPool.QueueUserWorkItem(fringePath.ThreadPoolCallback, paths.Count);
     }

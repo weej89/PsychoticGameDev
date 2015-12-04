@@ -16,6 +16,7 @@ public abstract class GridPath
 	protected ManualResetEvent doneEvent;
 	protected int pathId;
     protected object threadHandle;
+	protected float totalMs;
 
     protected System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
 	#endregion
@@ -44,13 +45,14 @@ public abstract class GridPath
 	/// <param name="_targetPos">_target position.</param>
 	/// <param name="_callback">_callback.</param>
 	/// <param name="_pathId">_path identifier.</param>
-	public GridPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, Action<Vector3[], bool> _callback, int _pathId)
+	public GridPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, Action<Vector3[], bool> _callback, int _pathId, float _totalMs)
 	{
 		grid = _grid;
 		meshCopy = _meshCopy;
 		startPos = _startPos;
 		targetPos = _targetPos;
 		callback = _callback;
+		totalMs = _totalMs;
 
 		//Sets the threading manual reset event to false
 		doneEvent = new ManualResetEvent(false);
@@ -88,11 +90,11 @@ public abstract class GridPath
 	/// <param name="pathType">Path type.</param>
 	/// <param name="numExpanded">Number nodes expanded.</param>
 	/// <param name="numWaypoints">Number waypoints in path</param>
-    public virtual void WriteResults(float time, string pathType, int numExpanded, int numWaypoints)
+    public virtual void WriteResults(float pathTime, float totalTime, string pathType, int numExpanded, int numWaypoints, float distance)
     {
         string results = string.Empty;
 
-        results += ("Expanded: " + numExpanded + " Path Length: " + numWaypoints + " Path Type: " + pathType + " Time: " + time + "ms");
+        results += ("Expanded: " + numExpanded + " Path Length: " + numWaypoints + " Path Type: " + pathType + " Path Time: " + pathTime + "ms " + " Total Time: " +totalMs + " Straight Line Dist: " +distance);
         TestFileRecord.WriteToThatFile(results, threadHandle);
     }
 	#endregion
@@ -152,6 +154,10 @@ public class Path
 {
 	public Vector3[] waypoints;
 	public bool pathSuccess;
+	public float pathTime;
+	public float totalMs;
+	public string pathType;
+	public int totalNodes;
 
 	private int pathId;
 

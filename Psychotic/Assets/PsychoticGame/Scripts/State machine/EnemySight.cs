@@ -120,6 +120,10 @@ public class EnemySight : MonoBehaviour
 			playerInCollider = false;
 			playerInSight = false;
 		}
+		if(other.gameObject.CompareTag("Door"))
+		{
+			objectInFront = false;
+		}
 	}
 
 	bool CheckForObjectInPath(Collider obj)
@@ -127,12 +131,16 @@ public class EnemySight : MonoBehaviour
 		if(obj.CompareTag("Door"))
 		{
 			Vector3 direction = obj.transform.position - transform.position;
+			float angle = Vector3.Angle(direction, transform.forward);
 
-			RaycastHit hit;
-
-			if(Physics.Raycast(transform.position + transform.up, direction - transform.up, out hit, objectRange))
+			if(angle < fieldOfViewAngle * 0.5f && Vector3.Distance(transform.position, obj.transform.position) <= 2.0f)
 			{
-				return true;
+				RaycastHit hit;
+
+				if(Physics.Raycast(transform.position + transform.up, direction - transform.up, out hit, objectRange))
+				{
+					return true;
+				}
 			}
 		}
 

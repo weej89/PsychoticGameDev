@@ -18,10 +18,10 @@ public class IDeepeningPath : GridPath
 	/// <param name="_targetPos">_target position.</param>
 	/// <param name="_callback">_callback.</param>
 	/// <param name="_pathId">_path identifier.</param>
-	public IDeepeningPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, Action<Vector3[], bool> _callback, int _pathId)
-		:base(_grid, _meshCopy, _startPos, _targetPos, _callback, _pathId)
+	public IDeepeningPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, Action<Vector3[], bool> _callback, int _pathId, float _totalMs)
+		:base(_grid, _meshCopy, _startPos, _targetPos, _callback, _pathId, _totalMs)
 	{
-
+		path.pathType = "IterativeDeepening";
 	}
 	#endregion
 
@@ -65,8 +65,9 @@ public class IDeepeningPath : GridPath
 
         stopWatch.Stop();
 
-		//Writes results from the run to the Test File
-        WriteResults(stopWatch.ElapsedMilliseconds, "Iterative Deepening", visitedHash.Count, path.waypoints.Length);
+		path.totalMs = totalMs + stopWatch.ElapsedMilliseconds;
+		path.pathTime = stopWatch.ElapsedMilliseconds;
+		path.totalNodes = visitedHash.Count;
 
 		//This must be set to let the Pathfinding object know that thread has completed its job
 		doneEvent.Set();

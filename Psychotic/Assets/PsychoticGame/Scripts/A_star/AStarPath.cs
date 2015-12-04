@@ -22,10 +22,16 @@ public class AStarPath : GridPath
 	/// <param name="_isVisible">If set to <c>true</c> _is visible.</param>
 	/// <param name="_callback">_callback.</param>
 	/// <param name="_pathId">_path identifier.</param>
-	public AStarPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, bool _isVisible, Action<Vector3[], bool> _callback, int _pathId)
-		:base(_grid, _meshCopy, _startPos, _targetPos, _callback, _pathId)
+	public AStarPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, bool _isVisible, Action<Vector3[], bool> _callback, int _pathId, float _totalMs)
+		:base(_grid, _meshCopy, _startPos, _targetPos, _callback, _pathId, _totalMs)
 	{
 		isVisible = _isVisible;
+
+		if(isVisible)
+			path.pathType = "Theta*";
+		else
+			path.pathType = "A*";
+
 	}
 	#endregion
 
@@ -106,8 +112,11 @@ public class AStarPath : GridPath
 				//Stops the stopwatch timer when pathfinding completed
             	stopWatch.Stop();
 
+				path.totalMs = totalMs + stopWatch.ElapsedMilliseconds;
+				path.pathTime = stopWatch.ElapsedMilliseconds;
+				path.totalNodes = closedSet.Count + openSet.Count;
+
 				//Writes the results of pathfinding to test file
-           	 	WriteResults(stopWatch.ElapsedMilliseconds, "A*", (openSet.Count + closedSet.Count), closedSet.Count);
 			}
 		}
 		catch(Exception ex)

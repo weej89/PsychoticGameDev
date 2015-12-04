@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
+using System.IO;
+using System.Diagnostics;
+using System.Threading;
 #endregion
 
 public class PathRequestManager : MonoBehaviour {
@@ -59,6 +62,7 @@ public class PathRequestManager : MonoBehaviour {
 		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback, pathType, lineOfSight, id);
 		enemysInQueue.Add(id);
 		instance.pathRequestQueue.Enqueue(newRequest);
+		newRequest.sw.Start();
 		instance.TryProcessNext();
 	}
 	#endregion
@@ -76,22 +80,24 @@ public class PathRequestManager : MonoBehaviour {
 			currentPathRequest = pathRequestQueue.Dequeue();
 			numWorkingPaths ++;
 
+			currentPathRequest.sw.Stop();
+
 			switch(currentPathRequest.pathfindingType)
 			{
 				case "A*":
-				StartCoroutine(pathfinding.AStarPathfinding(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.lineOfSight, currentPathRequest.callback, currentPathRequest.pathId));
+				StartCoroutine(pathfinding.AStarPathfinding(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.lineOfSight, currentPathRequest.callback, currentPathRequest.pathId, currentPathRequest.sw.ElapsedMilliseconds));
 				break;
 				case "DepthFirst":
 				StartCoroutine(pathfinding.DepthFirstSearch(currentPathRequest.pathStart, currentPathRequest.pathEnd));
 				break;
 				case "IterativeDeepening":
-				StartCoroutine(pathfinding.IterativeDeepening(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
+				StartCoroutine(pathfinding.IterativeDeepening(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId, currentPathRequest.sw.ElapsedMilliseconds));
 				break;
                 case "DynamicBiDirectional":
-                StartCoroutine(pathfinding.DynamicBiDirectional(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
+				StartCoroutine(pathfinding.DynamicBiDirectional(currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId, currentPathRequest.sw.ElapsedMilliseconds));
                 break;
                 case "Fringe":
-                StartCoroutine(pathfinding.FringeSearch (currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId));
+				StartCoroutine(pathfinding.FringeSearch (currentPathRequest.pathStart, currentPathRequest.pathEnd, currentPathRequest.callback, currentPathRequest.pathId, currentPathRequest.sw.ElapsedMilliseconds));
                 break;
 			}
 		}
@@ -110,8 +116,15 @@ public class PathRequestManager : MonoBehaviour {
 		TryProcessNext();
 	}
 
-	public void FinishedProcessingPath(GridPath foundPath) {
+	public void FinishedProcessingPath(GridPath foundPath) 
+	{
+		if(foundPath.path.pathSuccess)
+		{
+			foundPath.WriteResults(foundPath.path.pathTime, foundPath.path.pathTime + foundPath.path.totalMs, foundPath.path.pathType, foundPath.path.totalNodes, foundPath.path.waypoints.Length, Vector3.Distance(foundPath.path.waypoints[0], foundPath.path.waypoints[foundPath.path.waypoints.Length-1]));
+		}
+
 		foundPath.callback(foundPath.path.waypoints, foundPath.path.pathSuccess);
+
 		enemysInQueue.Remove(foundPath.path.PathID);
 		numWorkingPaths --;
 		TryProcessNext();
@@ -121,7 +134,7 @@ public class PathRequestManager : MonoBehaviour {
 	#region PathRequest (DataStructure)
 	//This struct is used for passing path data back and forth between the
 	//PathManager and Pathfinding object
-	struct PathRequest 
+	public class PathRequest 
 	{
 		public bool lineOfSight;
 		public Vector3 pathStart;
@@ -129,6 +142,8 @@ public class PathRequestManager : MonoBehaviour {
 		public Action<Vector3[], bool> callback;
 		public string pathfindingType;
 		public int pathId;
+
+		public System.Diagnostics.Stopwatch sw = new Stopwatch();
 		
 		public PathRequest(Vector3 _start, Vector3 _end, Action<Vector3[], bool> _callback, string _pathfindingType, bool _lineOfSight, int _pathId) {
 			pathStart = _start;

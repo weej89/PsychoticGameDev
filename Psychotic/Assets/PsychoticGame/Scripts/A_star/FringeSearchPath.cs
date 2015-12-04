@@ -18,8 +18,8 @@ public class FringeSearchPath : GridPath
 	/// <param name="_targetPos">_target position.</param>
 	/// <param name="_callback">_callback.</param>
 	/// <param name="_pathId">_path identifier.</param>
-	public FringeSearchPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, Action<Vector3[], bool> _callback, int _pathId)
-		:base(_grid, _meshCopy, _startPos, _targetPos, _callback, _pathId)
+	public FringeSearchPath(Grid _grid, Node[,] _meshCopy, Vector3 _startPos, Vector3 _targetPos, Action<Vector3[], bool> _callback, int _pathId, float _totalMs)
+		:base(_grid, _meshCopy, _startPos, _targetPos, _callback, _pathId, _totalMs)
 	{
 
 	}
@@ -119,9 +119,6 @@ public class FringeSearchPath : GridPath
 
                 if (path.pathSuccess)
                     path.waypoints = RetracePath(startNode, targetNode);
-
-				//Write the test results of pathfinding to the test file
-                WriteResults(stopWatch.ElapsedMilliseconds, "FringeSearch", cache.Count, path.waypoints.Length);
 			}
 		}
 		catch(Exception ex)
