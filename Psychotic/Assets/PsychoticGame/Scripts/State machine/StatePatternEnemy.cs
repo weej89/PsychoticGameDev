@@ -11,9 +11,7 @@ public class StatePatternEnemy : MonoBehaviour
 	#region Public Variables
 	public float searchingTurnSpeed = 120f;
 	public float searchingDuration = 4f;
-	public double avgPatrolInterval = 15;
-	public Transform[] wayPoints;
-	public Vector3 offset = new Vector3 (0, .5f, 0);
+	public double avgPatrolInterval;
 	public MeshRenderer meshRendererFlag;
 	public TargetArea targetArea;
 	public float targetAreaRadius = 50f;
@@ -22,6 +20,7 @@ public class StatePatternEnemy : MonoBehaviour
 	public float STAND_STILL = 0f;
 	public float SLOW_WALK = 2.0f;
 	public float NORMAL_WALK = 3.0f;
+	public float FAST_WALK = 3.5f;
 	public float RUNNING = 4.0f;
 	#endregion
 
@@ -33,6 +32,8 @@ public class StatePatternEnemy : MonoBehaviour
 	[HideInInspector] public PatrolState patrolState;
 	[HideInInspector] public AnimationController anim;
 	[HideInInspector] public EnemySight enemySight;
+	 public AudioSource walkingClip;
+	 public AudioSource chasingClip;
 
 	[HideInInspector] public string pathfindingStrategy;
 	#endregion
@@ -41,7 +42,7 @@ public class StatePatternEnemy : MonoBehaviour
 	private HorrorAI enemy;
 	private Grid grid;
 	private float decisionTime = 0;
-	private const float DECISION_COOLDOWN = .1f;
+	private const float DECISION_COOLDOWN = .05f;
 	private Queue<TreeAction> processedActions;
 	private GameObject pathFinding;
 	#endregion
@@ -73,7 +74,8 @@ public class StatePatternEnemy : MonoBehaviour
 	{
 		anim = GetComponent<AnimationController>();
 		patrolState.GetPatrolPoint(15.0);
-		currentState = patrolState;	
+		currentState = patrolState;
+		currentState.OnStateEnter();
 	}
 	#endregion
 
@@ -128,6 +130,11 @@ public class StatePatternEnemy : MonoBehaviour
 			//Dynamically Invokes the actions method to be performed if there is one
 			if(action.action != null)
 				action.action.DynamicInvoke();
+
+			if(action.speed > -1.0f)
+			{
+				enemy.speed = action.speed;
+			}
 
 			//Sends animation type to animation controller
 			anim.PerformTriggerAnimation(action.animation);

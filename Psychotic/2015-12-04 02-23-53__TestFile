@@ -1,0 +1,4 @@
+0. - Expanded: 24615 Path Length: 366 Path Type: A* Path Time: 197ms  Total Time: 0 Straight Line Dist: 210.7997
+1. - Expanded: 32704 Path Length: 380 Path Type: A* Path Time: 241ms  Total Time: 0 Straight Line Dist: 205.8895
+2. - Expanded: 3333 Path Length: 194 Path Type: A* Path Time: 12ms  Total Time: 225 Straight Line Dist: 96.81038
+3. - Expanded: 7462 Path Length: 168 Path Type: DynBiDirectional Path Time: 27ms  Total Time: 0 Straight Line Dist: 70.36512

@@ -149,8 +149,13 @@ public class ChaseState : IEnemyState
 	public void OnStateEnter()
 	{
 		searchTimer = 0f;
-		zombie.speed = zombie.DEFUALT_RUNNING_SPEED;
+		zombie.speed = enemy.RUNNING;
 		zombie.CallForNewPath(enemy.enemySight.targetLocation.position, enemy.pathfindingStrategy, true);
+
+		if(enemy.walkingClip.isPlaying)
+			enemy.walkingClip.Stop();
+
+		enemy.chasingClip.Play();
 	}
 	#endregion
 

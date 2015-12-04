@@ -133,6 +133,7 @@ public class AlertState : IEnemyState
 			targetState = "Alert",
 			pathFindingMethod = "A*",
 			animation = "None",
+			speed = enemy.FAST_WALK,
 			action = () => {
 				if(zombie.TargetReached)
 					zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "A*", false );
@@ -162,6 +163,7 @@ public class AlertState : IEnemyState
 	public void OnStateEnter()
 	{
 		searchTimer = 0f;
+		zombie.speed = enemy.STAND_STILL;
 	}
 	#endregion
 
@@ -176,7 +178,9 @@ public class AlertState : IEnemyState
 		searchTimer += Time.deltaTime;
 
 		if(zombie.TargetReached)
-			zombie.speed = 0;
+		{
+			zombie.speed = enemy.STAND_STILL;
+		}
 	}
 	#endregion
 

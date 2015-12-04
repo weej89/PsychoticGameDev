@@ -10,12 +10,13 @@ private var openRot : Vector3;
 function Start()
 {
 	defaultRot = transform.eulerAngles;
-	openRot = new Vector3 (defaultRot.x, defaultRot.y + DoorOpenAngle, defaultRot.z);
+	openRot = new Vector3 (defaultRot.x, defaultRot.y + DoorOpenAngle, defaultRot.z);	
 }
 
 //Main function
 function Update ()
 {
+	
 	if(open)
 	{
 		//Open door

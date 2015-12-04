@@ -101,14 +101,16 @@ public class PatrolState : IEnemyState
 		{
 			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
-			animation = "attack02"
+			animation = "attack02",
+			speed = enemy.STAND_STILL
 		};
 
 		actions[1] = new TreeAction()
 		{
 			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
-			animation = "None"
+			animation = "None",
+			speed = enemy.NORMAL_WALK
 		};
 
 		actions[2] = new TreeAction()
@@ -117,39 +119,44 @@ public class PatrolState : IEnemyState
 			args = {},
 			pathFindingMethod = "DynamicBiDirectional", 
 			targetState = "Patrol", 
-			animation = "None"
+			animation = "None",
+			speed = enemy.FAST_WALK
 		};
 
 		actions[3] = new TreeAction()
 		{
 			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
-			animation = "None"
+			animation = "None",
+			speed = enemy.NORMAL_WALK
 		};
 
 		actions[4] = new TreeAction()
 		{
 			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Chase",
-			animation = "None"
+			animation = "None",
+			speed = enemy.RUNNING
 		};
 
 		actions[5] = new TreeAction()
 		{
 			pathFindingMethod = "DynamicBiDirectional",
 			targetState = "Patrol",
-			animation = "None"
+			animation = "None",
+			speed = enemy.NORMAL_WALK
 		};
 
 		actions[6] = new TreeAction()
 		{
 			action = () => {
 				if(zombie.TargetReached)
-				zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "DynamicBiDirectional", false );
+					zombie.CallForNewPath(enemy.enemySight.targetLocation.position, "DynamicBiDirectional", false );
 			},
 			pathFindingMethod = "A*",
 			targetState = "Alert",
-			animation = "None"
+			animation = "None",
+			speed = enemy.SLOW_WALK
 		};
 	}
 	#endregion
@@ -189,7 +196,9 @@ public class PatrolState : IEnemyState
 	public void OnStateEnter()
 	{
 		GetPatrolPoint(enemy.avgPatrolInterval);
-		zombie.speed = zombie.DEFAULT_WALKING_SPEED;
+		zombie.speed = enemy.NORMAL_WALK;
+
+		enemy.walkingClip.Play();
 	}
 	#endregion
 
@@ -211,7 +220,8 @@ public class PatrolState : IEnemyState
 	/// <param name="avgInterval">Avg interval.</param>
 	public void GetPatrolPoint(double avgInterval)
 	{
-		patrolTime = GetNextRandomInterval(avgInterval) * avgInterval;
+		//patrolTime = GetNextRandomInterval(avgInterval) * avgInterval;
+		patrolTime = Random.Range((float)(avgInterval/2), (float)(avgInterval));
 		targetArea = new TargetArea(grid, zombie.target.position, enemy.targetAreaRadius);
 		currentTime = 0;
 	}

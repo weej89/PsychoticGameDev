@@ -6,7 +6,6 @@ public class EnemySight : MonoBehaviour
 {
 	public float fieldOfViewAngle = 110f;
 	public float sightRange = 35f;
-	public Vector3 offset = new Vector3 (0, .5f, 0);
 	public Transform eyes;
 	
 	[HideInInspector] public Transform targetLocation;
@@ -21,7 +20,7 @@ public class EnemySight : MonoBehaviour
 	private HorrorAI ai;
 	private float timeSinceAudibleCheck = 0;
 	private const int AUDIBLE_COOLDOWN = 4000;
-	private float objectRange = 2.0f;
+	private float objectRange = 1.5f;
 
 	// Use this for initialization
 	void Start () 
@@ -40,7 +39,7 @@ public class EnemySight : MonoBehaviour
 
 	void OnTriggerStay (Collider other)
 	{
-		objectInFront = CheckForObjectInPath(other);
+		CheckForObjectInPath(other);
 
 		// If the player has entered the trigger sphere...
 		if(other.gameObject.CompareTag("Player"))
@@ -126,24 +125,33 @@ public class EnemySight : MonoBehaviour
 		}
 	}
 
-	bool CheckForObjectInPath(Collider obj)
+	void CheckForObjectInPath(Collider obj)
 	{
-		if(obj.CompareTag("Door"))
+		if(obj.gameObject.CompareTag("Door"))
 		{
-			Vector3 direction = obj.transform.position - transform.position;
-			float angle = Vector3.Angle(direction, transform.forward);
+			Durability durability = obj.gameObject.GetComponent<Durability>();
 
-			if(angle < fieldOfViewAngle * 0.5f && Vector3.Distance(transform.position, obj.transform.position) <= 2.0f)
+			if(durability.Life > 0)
 			{
+				Vector3 direction = obj.transform.position - transform.position;
+				float angle = Vector3.Angle(direction, transform.forward);
+
+				objectInFront = false;
+				if(angle < fieldOfViewAngle * 0.5f && Vector3.Distance(transform.position, obj.transform.position) <= objectRange)
+				{
+					objectInFront = true;
+				/*
 				RaycastHit hit;
 
 				if(Physics.Raycast(transform.position + transform.up, direction - transform.up, out hit, objectRange))
 				{
 					return true;
 				}
+				*/
+				}
 			}
+			else
+				objectInFront = false;
 		}
-
-		return false;
 	}
 }
