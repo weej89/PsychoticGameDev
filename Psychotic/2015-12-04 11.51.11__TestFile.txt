@@ -1,0 +1,12 @@
+0. - Expanded: 10753 Path Length: 212 Path Type: A* Path Time: 314ms  Total Time: 0 Straight Line Dist: 105.1404
+1. - Expanded: 13351 Path Length: 266 Path Type: A* Path Time: 360ms  Total Time: 0 Straight Line Dist: 153.701
+2. - Expanded: 23776 Path Length: 396 Path Type: A* Path Time: 456ms  Total Time: 0 Straight Line Dist: 223.9118
+3. - Expanded: 792 Path Length: 28 Path Type: DynBiDirectional Path Time: 7ms  Total Time: 0 Straight Line Dist: 12.5
+4. - Expanded: 798 Path Length: 25 Path Type: DynBiDirectional Path Time: 4ms  Total Time: 0 Straight Line Dist: 11
+5. - Expanded: 40 Path Length: 10 Path Type: A* Path Time: 0ms  Total Time: 0 Straight Line Dist: 4.527693
+6. - Expanded: 39 Path Length: 11 Path Type: A* Path Time: 0ms  Total Time: 0 Straight Line Dist: 5
+7. - Expanded: 47 Path Length: 11 Path Type: A* Path Time: 0ms  Total Time: 0 Straight Line Dist: 5.220153
+8. - Expanded: 49 Path Length: 11 Path Type: Theta* Path Time: 1ms  Total Time: 0 Straight Line Dist: 5.385165
+9. - Expanded: 56 Path Length: 12 Path Type: A* Path Time: 1ms  Total Time: 0 Straight Line Dist: 6.264982
+10. - Expanded: 61 Path Length: 13 Path Type: Theta* Path Time: 2ms  Total Time: 0 Straight Line Dist: 6.946222
+11. - Expanded: 28 Path Length: 6 Path Type: Theta* Path Time: 1ms  Total Time: 0 Straight Line Dist: 2.54951

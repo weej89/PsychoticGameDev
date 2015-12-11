@@ -164,6 +164,7 @@ public class AlertState : IEnemyState
 	{
 		searchTimer = 0f;
 		zombie.speed = enemy.STAND_STILL;
+		enemy.StopPath();
 	}
 	#endregion
 

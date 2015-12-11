@@ -127,10 +127,6 @@ public class StatePatternEnemy : MonoBehaviour
 			if(currentState.GetString() != action.targetState)
 				PerformStateTransition(action.targetState);
 
-			//Dynamically Invokes the actions method to be performed if there is one
-			if(action.action != null)
-				action.action.DynamicInvoke();
-
 			if(action.speed > -1.0f)
 			{
 				enemy.speed = action.speed;
@@ -138,6 +134,10 @@ public class StatePatternEnemy : MonoBehaviour
 
 			//Sends animation type to animation controller
 			anim.PerformTriggerAnimation(action.animation);
+
+			//Dynamically Invokes the actions method to be performed if there is one
+			if(action.action != null)
+				action.action.DynamicInvoke();
 		}
 	}
 	#endregion
@@ -167,7 +167,10 @@ public class StatePatternEnemy : MonoBehaviour
 	}
 	#endregion
 
-
+	public void StopPath()
+	{
+		enemy.StopFollwPath();
+	}
 
 	public void OnDrawGizmos()
 	{

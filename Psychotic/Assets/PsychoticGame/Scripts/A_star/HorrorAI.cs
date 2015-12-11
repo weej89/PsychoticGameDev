@@ -87,6 +87,12 @@ public class HorrorAI : MonoBehaviour
 	}
 	#endregion
 
+	public void StopFollwPath()
+	{
+		targetReached = true;
+		StopCoroutine("FollowPath");
+	}
+
 	#region FollowPath
 	/// <summary>
 	/// Enumerator used to follow path on a separate thread

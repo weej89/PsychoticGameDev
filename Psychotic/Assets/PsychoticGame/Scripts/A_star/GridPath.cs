@@ -109,13 +109,13 @@ public abstract class GridPath
 	/// <param name="endNode">End node.</param>
 	public virtual Vector3[] RetracePath(Node startNode, Node endNode)
 	{
-		List<Node> path = new List<Node>();
+		Thread.Sleep(1);
+
 		List<Vector3> points = new List<Vector3>();
 		Node currentNode = endNode;
 		
 		while(currentNode != startNode)
 		{
-			path.Add(currentNode);
 			points.Add(currentNode.worldPosition);
 			currentNode = currentNode.parent;
 		}
